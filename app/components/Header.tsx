@@ -77,7 +77,7 @@ const courses = [
 const Header = () => {
     const {user} = useUser()
   return (
-    <div className="p-4 w-full flex justify-between items-center">
+    <div className="py-4 px-16  w-full flex justify-between items-center">
         <div className="flex gap-4 items-center">
         <img src="/crown.png" alt="Logo" className="w-10 h-10" />
         <h2 className="font-game text-3xl mt-2">Code Adventure</h2>
@@ -117,9 +117,11 @@ const Header = () => {
 </NavigationMenu>
         
     { !user ? <Link href='/sign-in
-    '><Button className="text-2xl font-game" variant="pixel">Sign up</Button></Link> :
+    '><Button className="text-2xl font-game cursor-pointer" size={'lg'} variant="pixel">Sign up</Button></Link> :
      <div className="flex justify-center items-center gap-6">
-        <Button className="text-2xl font-game" variant="pixel">Dashboard</Button>
+        <Link href='/dashboard'>
+        <Button className="text-2xl cursor-pointer font-game" size={'lg'} variant="pixel">Dashboard</Button>
+        </Link>
         <UserButton />
      </div>
 }

@@ -5,9 +5,9 @@ import Image from "next/image"
 const UserCurrentStatus = () => {
     const {user} = useUser()
   return (
-    <div className="bg-zinc-900 p-6 border-2 rounded-xl">
-        <div className="flex gap-3  justify-center items-center">
-        <Image src={'/alex_walk.gif'} alt='Your profile' width={80} height={80}/>
+    <div className="bg-zinc-900 p-4 border-2 rounded-xl">
+        <div className="flex gap-6  justify-center items-center">
+        <Image src={'/trainer.gif'} alt='Your profile' width={60} height={60}/>
         <h2 className="font-game text-2xl">{user?.primaryEmailAddress?.emailAddress} </h2>
         </div>
         <div className="grid gap-4 grid-cols-2 mt-4">

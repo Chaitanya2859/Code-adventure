@@ -1,6 +1,7 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react"
 
 const EnrollCourses = () => {
@@ -13,7 +14,9 @@ const EnrollCourses = () => {
          <div className="flex flex-col items-center gap-2 p-6 border-2 bg-zinc-900 rounded-2xl">
             <Image src='/books.png' alt='book' width={90} height={90} />
             <h1 className="font-game text-3xl">You don't have any enrolled courses</h1>
+            <Link href={'/courses'}>
             <Button variant={'pixel'} size={'lg'} className="font-game text-2xl">Browse all courses</Button>
+            </Link>
          </div>:
          <div className="">
          </div> 

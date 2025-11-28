@@ -3,7 +3,7 @@ import Image from "next/image"
 
 const Hero = () => {
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full min-h-[calc(100vh-11vh)] overflow-hidden">
         <Image src={'/hero3.gif'} alt='Hero' width={1000} height={1000} className="w-full h-full object-cover absolute inset-0"></Image>
         <div className="absolute w-full mt-32 flex flex-col justify-center items-center">
             <h2 className="font-bold text-7xl font-game" 

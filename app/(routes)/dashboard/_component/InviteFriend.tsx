@@ -6,7 +6,7 @@ const InviteFriend = () => {
   return (
     <div className="mt-6 flex justify-center items-center border-2 bg-zinc-900 rounded-lg p-6 font-game flex-col">
         <div className="flex flex-col justify-center items-center">
-        <Image src='/mail.png' alt='mail' width={80} height={80} />
+        <Image src='/letter.gif' alt='mail' className="mb-4" width={100} height={100} />
         <h2 className="text-3xl ">Invite Friend</h2>
         </div>
         <p className="text-xl text-zinc-400">Having fun? Share the love with a friend ! Enter an email and we will send them a personal invite</p>

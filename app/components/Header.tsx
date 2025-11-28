@@ -99,19 +99,13 @@ const Header = () => {
       </NavigationMenuContent>
     </NavigationMenuItem>
         <NavigationMenuItem>
-        <NavigationMenuLink>
             <Link href={'/projects'}>Project</Link>
-        </NavigationMenuLink>
     </NavigationMenuItem>
             <NavigationMenuItem>
-        <NavigationMenuLink>
             <Link href={'/pricing'}>Pricing</Link>
-        </NavigationMenuLink>
     </NavigationMenuItem>
             <NavigationMenuItem>
-        <NavigationMenuLink>
             <Link href={'/contactus'}>Contact us</Link>
-        </NavigationMenuLink>
     </NavigationMenuItem>
   </NavigationMenuList>
 </NavigationMenu>

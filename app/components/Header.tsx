@@ -84,9 +84,9 @@ const Header = () => {
         </div>
 
         <NavigationMenu>
-  <NavigationMenuList className="gap-8">
+  <NavigationMenuList className="gap-8 font-game text-2xl">
     <NavigationMenuItem>
-      <NavigationMenuTrigger>Courses</NavigationMenuTrigger>
+      <NavigationMenuTrigger className="font-game text-2xl">Courses</NavigationMenuTrigger>
       <NavigationMenuContent>
         <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
             {courses.map((course, index)=>(

@@ -12,7 +12,7 @@ const InviteFriend = () => {
         <p className="text-xl text-zinc-400">Having fun? Share the love with a friend ! Enter an email and we will send them a personal invite</p>
         <div className="flex justify-center mt-2 items-center gap-8">
             <Input placeholder="Enter Invitee Email" size={50} className="text-2xl" />
-            <Button variant={'pixel'} size={'lg'} className="text-xl hover:bg-yellow-300 cursor-pointer">Invite</Button>
+            <Button variant={'pixel'} size={'lg'} className="text-2xl font-game hover:bg-yellow-300 cursor-pointer">Invite</Button>
         </div>
     </div>
   )

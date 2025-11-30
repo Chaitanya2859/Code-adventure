@@ -2,6 +2,7 @@
 import { useUser } from "@clerk/nextjs"
 import Image from "next/image"
 
+
 const UserCurrentStatus = () => {
     const {user} = useUser()
   return (

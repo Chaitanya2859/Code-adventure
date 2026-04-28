@@ -9,7 +9,7 @@ const UserCurrentStatus = () => {
     <div className="bg-zinc-900 p-4 border-2 rounded-xl">
         <div className="flex gap-6  justify-center items-center">
         <Image src={'/trainer.gif'} alt='Your profile' width={60} height={60}/>
-        <h2 className="font-game text-2xl">{user?.primaryEmailAddress?.emailAddress} </h2>
+        <h2 className="font-game">{user?.primaryEmailAddress?.emailAddress.length! > 20 ? <div className="text-xl">{user?.primaryEmailAddress?.emailAddress} </div>: <div className="text-2xl">{user?.primaryEmailAddress?.emailAddress} </div>} </h2>
         </div>
         <div className="grid gap-4 grid-cols-2 mt-4">
             <div className="">

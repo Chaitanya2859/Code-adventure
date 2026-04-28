@@ -36,7 +36,8 @@ type Exercise={
 
 type Props= {
     courseDetail: Course | undefined,
-    loading: boolean
+    loading: boolean,
+    refreshData: ()=> void
 }
 
 const course = () => {
@@ -51,14 +52,14 @@ const course = () => {
 
     const getCourseDetail = async ()=>{
         setLoading(true)
-        const res=await axios.get('/api/course?courseid='+courseId)
-        console.log(res.data)
+        const res = await axios.get('/api/course?courseid=' + courseId)
         setCourseDetail(res?.data)
         setLoading(false)
     }
   return (
     <div className="">
         <CourseDetail
+        refreshData={()=> getCourseDetail()}
         loading={loading}
         courseDetail= {courseDetail}
         />

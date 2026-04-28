@@ -6,13 +6,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+import { Skeleton } from "@/components/ui/skeleton"
+
  type Course={
     id: number,
     courseId: number,
     title: string,
     desc: string,
     banner: string,
-    difficulty: string
+    difficulty: string,
+    userEnroll?: boolean
 }
 
  const CourseList = () => {
@@ -25,20 +28,28 @@ import { useEffect, useState } from "react"
 
     const getAllCourses= async ()=>{
         setLoading(true)
-        const res= await axios.get('/api/course')
+        const res = await axios.get('/api/course')
         setLoading(false)
-        console.log(res)
         setCourseList(res?.data)
     }
 
   return (
     <div className="grid grid-cols-1 cursor-pointer mx-8 px-8 py-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-        {
-            
-        courseList?.map((key, index)=>(
-            <Link href={'/courses/' + key.courseId}  key={index} >
-            <div className=" mx-4 rounded-xl hover:bg-zinc-900 p-4" key={index}>
-                <Image src={(key?.banner).trimEnd()} alt={key?.title} width={400} className="h-35 w-full rounded-t-md" height={400} />
+        { loading ? 
+            [1,2,3,4,5,6].map((item) => (
+                <div key={item} className="mx-4 rounded-xl p-4 space-y-3">
+                    <Skeleton className="h-40 w-full rounded-t-md" />
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-10 w-24 rounded-xl" />
+                </div>
+            ))
+        :
+        courseList?.map((key)=>(
+            <Link href={'/courses/' + key.courseId}  key={key.courseId} >
+            <div className=" mx-4 rounded-xl hover:bg-zinc-900 p-4">
+                <Image src={(key?.banner).trimEnd()} alt={key?.title} unoptimized width={400} className="h-35 w-full rounded-t-md" height={400} />
                 <div className="font-game">
                     <h2  className="text-4xl">{key.title}</h2>
                     <p className="font-game text-xl text-gray-400 line-clamp-2">{key.desc}</p>

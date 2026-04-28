@@ -27,7 +27,9 @@ type Course={
     desc: string,
     banner: string,
     difficulty: string,
-    chapter: Chapter[]
+    chapter: Chapter[],
+    completedExercises?: string[],
+    earnedXp?: number
 }
 
 type Props={
@@ -38,11 +40,18 @@ const CourseStatus = ({courseDetail}: Props) => {
 
     const [count, setCount]= useState<{
         totalExercise:number,
-        totalXP: number
-    }>()
+        totalXP: number,
+        completedExercise: number,
+        earnedXP: number
+    }>({
+        totalExercise: 0,
+        totalXP: 0,
+        completedExercise: 0,
+        earnedXP: 0
+    })
 
     useEffect(()=>{
-        courseDetail && getCount()
+        if(courseDetail) getCount()
     },[courseDetail])
 
     const getCount = ()=>{
@@ -56,9 +65,14 @@ const CourseStatus = ({courseDetail}: Props) => {
         })
         setCount({
             totalExercise : total,
-            totalXP:xp
+            totalXP: xp,
+            completedExercise: courseDetail?.completedExercises?.length || 0,
+            earnedXP: courseDetail?.earnedXp || 0
         })
     }
+
+    const exerciseProgress = count.totalExercise > 0 ? (count.completedExercise / count.totalExercise) * 100 : 0
+    const xpProgress = count.totalXP > 0 ? (count.earnedXP / count.totalXP) * 100 : 0
 
   return (
     <div className="font-game p-4 border-4 rounded-lg w-full">
@@ -67,15 +81,15 @@ const CourseStatus = ({courseDetail}: Props) => {
             <div className="flex gap-4 px-2">
                 <Image src='/books.png' alt='books' width={50} height={50} />
                 <div className="flex w-full flex-col gap-5">
-                    <h2 className="text-2xl flex justify-between">Exercises <span className="text-gray-300">1/{count?.totalExercise}</span> </h2>
-                    <Progress className="w-full" value={67} />
+                    <h2 className="text-2xl flex justify-between">Exercises <span className="text-gray-300">{count.completedExercise}/{count.totalExercise}</span> </h2>
+                    <Progress className="w-full" value={exerciseProgress} />
                 </div>
             </div>
         <div className="flex gap-4 p-2 mt-4">
-                <Image src='/star.png' alt='books' width={50} height={50} />
+                <Image src='/star.png' alt='star' width={50} height={50} />
                 <div className="flex w-full flex-col gap-2">
-                    <h2 className="text-2xl flex justify-between">XP earned <span className="text-gray-300">67/{count?.totalXP}</span> </h2>
-                    <Progress className="w-full" value={67} />
+                    <h2 className="text-2xl flex justify-between">XP earned <span className="text-gray-300">{count.earnedXP}/{count.totalXP}</span> </h2>
+                    <Progress className="w-full" value={xpProgress} />
                 </div>
             </div>
         </div>

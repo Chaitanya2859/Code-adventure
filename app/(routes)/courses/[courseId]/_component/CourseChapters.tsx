@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
 
 import {
   Tooltip,
@@ -22,7 +23,9 @@ type Course={
     desc: string,
     banner: string,
     difficulty: string,
-    chapter: Chapter[]
+    chapter: Chapter[],
+    completedExercises?: string[],
+    earnedXp?: number
 }
 
 type Chapter={
@@ -66,23 +69,24 @@ const CourseChapters = ({loading , courseDetail}: Props) => {
     <AccordionContent className="p-6 text-xl text-gray-300">
         <div className="bg-zinc-900 p-2 rounded-2xl">
             {chapter.exercises.map((exercise, idx)=>{
+                const isCompleted = courseDetail?.completedExercises?.includes(exercise.slug)
+
                 return <div className="flex p-4  text-2xl justify-between hover:bg-zinc-800 rounded-2xl" key={idx}>
                     <div className="flex gap-4">
                     <h2> Exercise: {idx+1} : </h2>
                     <h1> {exercise.name}</h1>
                     </div>
-                    <div className="">
-                        <Tooltip >
-                            <TooltipTrigger>
-                                <Button variant={'locked'} size={'lg'} className="font-game text-2xl">
-                                    ???
-                                    {/* {exercise.xp} xp */}
-                                </Button></TooltipTrigger>
-                            <TooltipContent>
-                        <p className="font-game text-lg">Enroll course first</p>
-                    </TooltipContent>
-                </Tooltip>
-                    </div>
+                        <Link href={`/courses/${courseDetail?.courseId}/practice/${exercise.slug}`}>
+                            {isCompleted ? (
+                                <Button className="font-game text-2xl bg-emerald-500 hover:bg-emerald-600 text-white border-4 border-b-8 border-emerald-700 active:border-b-4 active:mt-1">
+                                    Completed
+                                </Button>
+                            ) : (
+                                <Button className="font-game text-2xl bg-yellow-400 hover:bg-yellow-500 text-black border-4 border-b-8 border-yellow-600 active:border-b-4 active:mt-1">
+                                    Practice Now
+                                </Button>
+                            )}
+                        </Link>
                 </div>
             })}
         </div>

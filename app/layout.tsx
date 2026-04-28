@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Jersey_10 } from "next/font/google";
+import { Geist, Jersey_10 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
@@ -7,14 +7,10 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import Provider from "./provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -22,12 +18,6 @@ const gameFont = Jersey_10({
   variable: "--font-game",
   subsets: ["latin"],
   weight: ['400']
-});
-
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -43,8 +33,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
     <html lang="en" suppressHydrationWarning className="dark">
-      <body
-        className={`${geistSans.variable} ${gameFont.variable} ${inter.variable} ${geistMono.variable} antialiased`}
+      <body suppressHydrationWarning
+        className={`${geistSans.variable} ${gameFont.variable} antialiased`}
       >          <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -53,6 +43,7 @@ export default function RootLayout({
           >
              <Provider attribute="class" defaultTheme="system">
             {children}
+            <Toaster />
             </Provider>
           </ThemeProvider>
       </body>

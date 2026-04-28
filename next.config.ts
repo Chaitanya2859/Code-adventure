@@ -1,11 +1,30 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  images:{
-    domains: ['media4.giphy.com','media0.giphy.com','media2.giphy.com','media3.giphy.com','www.codedex.io']
-  }
-
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "media4.giphy.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media0.giphy.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media2.giphy.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media3.giphy.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.codedex.io",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

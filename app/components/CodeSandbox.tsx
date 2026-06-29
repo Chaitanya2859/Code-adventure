@@ -57,6 +57,7 @@ interface CodeSandboxProps {
   isAlreadyCompleted?: boolean
   prevHref?: string
   nextHref?: string
+  initialXp?: number
 }
 
 // ────────────────────────────────────────────────────
@@ -103,6 +104,16 @@ function buildSrcdoc(files: FileState): string {
     const _log = console.log;
     const _error = console.error;
     const _warn = console.warn;
+
+    // Alias HashRouter and BrowserRouter to MemoryRouter to prevent "Failed to construct URL: about:srcdoc" errors in the sandboxed preview
+    const checkRouterInterval = setInterval(function() {
+      if (window.ReactRouterDOM && window.ReactRouterDOM.MemoryRouter) {
+        window.ReactRouterDOM.HashRouter = window.ReactRouterDOM.MemoryRouter;
+        window.ReactRouterDOM.BrowserRouter = window.ReactRouterDOM.MemoryRouter;
+        clearInterval(checkRouterInterval);
+      }
+    }, 10);
+    setTimeout(function() { clearInterval(checkRouterInterval); }, 2000);
     
     function sendLog(type, args) {
       const formatted = args.map(arg => {
@@ -115,6 +126,17 @@ function buildSrcdoc(files: FileState): string {
         }
         return String(arg);
       }).join(' ');
+
+      // Filter out the Babel standalone in-browser warning log
+      if (formatted.includes('You are using the in-browser Babel transformer')) {
+        return;
+      }
+
+      // Filter out React Router Future Flag Warnings
+      if (formatted.includes('React Router Future Flag Warning')) {
+        return;
+      }
+
       window.parent.postMessage({ type: 'CONSOLE_LOG', logType: type, message: formatted }, '*');
     }
 
@@ -144,9 +166,26 @@ function buildSrcdoc(files: FileState): string {
   const withStyles = withInterceptor.replace(
     '<style>/* CSS will be injected here */</style>',
     `<style>${files.css}</style>`
-  )
-  const withScript = withStyles.replace('</body>', `<script>${files.js}</script>\n</body>`)
-  return withScript
+  );
+
+  let withScript = '';
+  const scriptRegex = /<script[^>]*src=["']?script\.js["']?[^>]*><\/script>/i;
+
+  if (withStyles.match(scriptRegex)) {
+    const isBabel = withStyles.includes('type="text/babel"') || withStyles.includes("type='text/babel'");
+    if (isBabel) {
+      withScript = withStyles.replace(scriptRegex, `<script type="text/babel">${files.js}</script>`);
+    } else {
+      withScript = withStyles.replace(scriptRegex, `<script>${files.js}</script>`);
+    }
+  } else if (withStyles.includes('type="text/python"') || withStyles.includes("type='text/python'")) {
+    const pythonRegex = /<script[^>]*type=["']?text\/python["']?[^>]*><\/script>/i;
+    withScript = withStyles.replace(pythonRegex, `<script type="text/python" id="code">${files.js}</script>`);
+  } else {
+    withScript = withStyles.replace('</body>', `<script>${files.js}</script>\n</body>`);
+  }
+
+  return withScript;
 }
 
 // ────────────────────────────────────────────────────
@@ -169,6 +208,7 @@ export default function CodeSandbox({
   isAlreadyCompleted = false,
   prevHref,
   nextHref,
+  initialXp = 0,
 }: CodeSandboxProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -182,7 +222,7 @@ export default function CodeSandbox({
   const [iframeKey, setIframeKey] = useState(0)      // force iframe remount on run
   const [hasRun, setHasRun] = useState(true)         // track if code has been run
   const [completed, setCompleted] = useState(isAlreadyCompleted)   // completion state
-  const [totalXp, setTotalXp] = useState(0)           // accumulated XP
+  const [totalXp, setTotalXp] = useState(initialXp)           // accumulated XP
   const [doneCount, setDoneCount] = useState(isAlreadyCompleted ? 1 : 0)       // exercises completed
   const [showBanner, setShowBanner] = useState(false) // completion banner
 
@@ -235,7 +275,8 @@ export default function CodeSandbox({
     setCompiledCode(buildSrcdoc(files))
     setHasRun(true)
     setIframeKey(k => k + 1)   // remount = clean slate
-    if (activeTab === 'js' || language === 'js') {
+    // Switch to console upon running only if we are in the JavaScript course (courseId = '6')
+    if (courseId === '6') {
       setRightTab('console')
     }
   }
@@ -425,8 +466,26 @@ export default function CodeSandbox({
               >
                 {tab === 'html' && <span className="text-orange-500 bg-white rounded-sm px-1 text-xs">5</span>}
                 {tab === 'css' && <span className="text-blue-500 bg-white rounded-sm px-1 text-xs">3</span>}
-                {tab === 'js' && <span className="text-yellow-500 bg-white rounded-sm px-1 text-xs">JS</span>}
-                {tab === 'html' ? 'star.html' : `style.${tab}`}
+                {tab === 'js' && (
+                  <span className={`rounded-sm px-1 text-xs font-bold ${
+                    courseId === '5' 
+                      ? 'text-[#38bdf8] bg-blue-950/40' 
+                      : courseId === '7'
+                        ? 'text-emerald-400 bg-emerald-950/40'
+                        : 'text-yellow-500 bg-white'
+                  }`}>
+                    {courseId === '5' ? 'PY' : courseId === '7' ? 'NODE' : 'JS'}
+                  </span>
+                )}
+                {tab === 'html' 
+                  ? 'star.html' 
+                  : tab === 'css' 
+                    ? 'style.css' 
+                    : courseId === '5' 
+                      ? 'main.py' 
+                      : courseId === '7'
+                        ? 'app.js'
+                        : 'script.js'}
               </button>
             )})}
           </div>
@@ -435,7 +494,7 @@ export default function CodeSandbox({
           <div className="flex-1 pt-2 pb-16 overflow-hidden">
             <Editor
               height="100%"
-              language={TAB_LANGUAGE_MAP[activeTab]}
+              language={courseId === '5' && activeTab === 'js' ? 'python' : TAB_LANGUAGE_MAP[activeTab]}
               value={files[activeTab]}
               theme="vs-dark"
               onMount={handleEditorMount}
@@ -600,13 +659,23 @@ export default function CodeSandbox({
           </button>
           <div className="flex flex-col">
              <h3 className="text-sm font-bold text-white leading-tight">{instruction.mainHeading || "Exercise"}</h3>
-             <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2 mt-1">
                <span className="text-xs text-zinc-500">
                  Exercise {exerciseNumber} / {totalExercises}
                </span>
                <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-400 px-2 py-0.5 rounded-full">
                  {totalXp} XP
                </span>
+               <span className="text-[10px] font-bold bg-blue-950 text-[#38bdf8] px-2 py-0.5 rounded-full border border-blue-900/50">
+                 Lvl {Math.floor(totalXp / 100) + 1}
+               </span>
+               {/* Sleek mini level progress bar */}
+               <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700/60 ml-1" title={`${totalXp % 100} / 100 XP to next level`}>
+                 <div 
+                   className="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-500"
+                   style={{ width: `${totalXp % 100}%` }}
+                 />
+               </div>
              </div>
           </div>
         </div>

@@ -42,8 +42,13 @@ export async function GET(req: NextRequest) {
 
         const streak = getStreak(dates);
 
+        const level = Math.floor(totalXp / 100) + 1;
+        const levelProgress = totalXp % 100;
+
         return NextResponse.json({
             xp: totalXp,
+            level: level,
+            levelProgress: levelProgress,
             badges: badgesCount,
             streak: streak
         }, {

@@ -1,10 +1,13 @@
 import CodeSandbox from "@/app/components/CodeSandbox"
 import { db } from "@/config/db"
-import { chapterTable, completedExerciseTable } from "@/config/userschema"
+import { chapterTable, completedExerciseTable, enrolledCourseTable } from "@/config/userschema"
 import { eq, and } from "drizzle-orm"
 import htmlExercises from "@/html-exercises"
 import cssExercises from "@/css-exercises"
 import jsExercises from "@/js-exercises"
+import reactExercises from "@/react-exercises"
+import pythonExercises from "@/pythonExercises"
+import nodeExercises from "@/nodeExercises"
 
 // ────────────────────────────────────────────────────
 // Static exercise data (keyed by slug)
@@ -14,6 +17,9 @@ const exerciseData: Record<string, any> = {
   ...htmlExercises,
   ...cssExercises,
   ...jsExercises,
+  ...reactExercises,
+  ...pythonExercises,
+  ...nodeExercises,
   'hello-world': {
     numberTitle: '01. The Silent Void',
     mainHeading: 'Lighting the Spark',
@@ -140,29 +146,41 @@ export default async function PracticePage({
   
   const user = await currentUser();
   let isAlreadyCompleted = false;
+  let userGlobalXp = 0;
   
   if (user?.primaryEmailAddress?.emailAddress) {
+    const email = user.primaryEmailAddress.emailAddress;
     const existing = await db.select().from(completedExerciseTable).where(
       and(
         eq(completedExerciseTable.courseId, Number(courseId)),
         eq(completedExerciseTable.exerciseId, slug),
-        eq(completedExerciseTable.userId, user.primaryEmailAddress.emailAddress)
+        eq(completedExerciseTable.userId, email)
       )
     );
     isAlreadyCompleted = existing.length > 0;
+
+    const enrollments = await db.select().from(enrolledCourseTable).where(
+      eq(enrolledCourseTable.userId, email)
+    );
+    userGlobalXp = enrollments.reduce((sum, item) => sum + (item.xpEarned || 0), 0);
   }
   
   // Only show relevant tabs based on course
   const isHtmlCourse = courseId === '1'
   const isCssCourse = courseId === '2'
   const isJsCourse = courseId === '6'
+  const isReactCourse = courseId === '3'
+  const isPythonCourse = courseId === '5'
+  const isNodeCourse = courseId === '7'
   const tabs = isHtmlCourse 
     ? ['html' as const] 
     : isCssCourse 
       ? ['html' as const, 'css' as const] 
       : isJsCourse
         ? ['html' as const, 'js' as const]
-        : undefined
+        : (isReactCourse || isPythonCourse || isNodeCourse)
+          ? ['js' as const]
+          : undefined
 
   // Calculate Navigation
   const slugs = Object.keys(exerciseData).filter(k => k !== '_default')
@@ -199,6 +217,7 @@ export default async function PracticePage({
       nextHref={nextHref}
       exerciseNumber={currentIndex + 1}
       totalExercises={slugs.length}
+      initialXp={userGlobalXp}
     />
   )
 }

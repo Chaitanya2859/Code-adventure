@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Editor, { OnMount } from '@monaco-editor/react'
 import { Button } from '@/components/ui/button'
 import { Play, RotateCcw, List, TerminalSquare, CheckCircle2, Trophy, ArrowLeft } from 'lucide-react'
 import type * as Monaco from 'monaco-editor'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 // ────────────────────────────────────────────────────
 // Types
@@ -17,6 +18,12 @@ interface FileState {
   html: string
   css: string
   js: string
+}
+
+interface ConsoleLogEntry {
+  type: 'log' | 'error' | 'warn';
+  message: string;
+  timestamp: Date;
 }
 
 interface Instruction {
@@ -90,8 +97,51 @@ const TAB_LANGUAGE_MAP: Record<Tab, string> = {
 // Helper – Build srcdoc from all three files
 // ────────────────────────────────────────────────────
 function buildSrcdoc(files: FileState): string {
+  const consoleInterceptorScript = `
+<script>
+  (function() {
+    const _log = console.log;
+    const _error = console.error;
+    const _warn = console.warn;
+    
+    function sendLog(type, args) {
+      const formatted = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg);
+          } catch (e) {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
+      window.parent.postMessage({ type: 'CONSOLE_LOG', logType: type, message: formatted }, '*');
+    }
+
+    console.log = function(...args) {
+      _log.apply(console, args);
+      sendLog('log', args);
+    };
+    console.error = function(...args) {
+      _error.apply(console, args);
+      sendLog('error', args);
+    };
+    console.warn = function(...args) {
+      _warn.apply(console, args);
+      sendLog('warn', args);
+    };
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      sendLog('error', [message + ' (line ' + lineno + ')']);
+      return false;
+    };
+  })();
+</script>
+`;
+
   // Inject CSS and JS into the HTML string
-  const withStyles = files.html.replace(
+  const withInterceptor = consoleInterceptorScript + files.html;
+  const withStyles = withInterceptor.replace(
     '<style>/* CSS will be injected here */</style>',
     `<style>${files.css}</style>`
   )
@@ -130,11 +180,44 @@ export default function CodeSandbox({
   })
   const [activeTab, setActiveTab] = useState<Tab>(language)
   const [iframeKey, setIframeKey] = useState(0)      // force iframe remount on run
-  const [hasRun, setHasRun] = useState(false)         // track if code has been run
+  const [hasRun, setHasRun] = useState(true)         // track if code has been run
   const [completed, setCompleted] = useState(isAlreadyCompleted)   // completion state
   const [totalXp, setTotalXp] = useState(0)           // accumulated XP
   const [doneCount, setDoneCount] = useState(isAlreadyCompleted ? 1 : 0)       // exercises completed
   const [showBanner, setShowBanner] = useState(false) // completion banner
+
+  const [rightTab, setRightTab] = useState<'preview' | 'console'>('preview')
+  const [consoleLogs, setConsoleLogs] = useState<ConsoleLogEntry[]>([])
+  
+  const [compiledCode, setCompiledCode] = useState(() => buildSrcdoc({
+    ...DEFAULT_FILES,
+    ...defaultFiles,
+  }))
+
+  useEffect(() => {
+    const fresh = { ...DEFAULT_FILES, ...defaultFiles }
+    setFiles(fresh)
+    setCompiledCode(buildSrcdoc(fresh))
+    setConsoleLogs([])
+    setRightTab('preview')
+  }, [defaultFiles])
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'CONSOLE_LOG') {
+        setConsoleLogs(prev => [
+          ...prev,
+          {
+            type: event.data.logType,
+            message: event.data.message,
+            timestamp: new Date()
+          }
+        ])
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   // ── Editor mount ────────────────────────────────
   const handleEditorMount: OnMount = (editor) => {
@@ -148,8 +231,20 @@ export default function CodeSandbox({
 
   // ── Run: inject content into iframe ────────────
   const handleRun = () => {
+    setConsoleLogs([]) // clear logs on run
+    setCompiledCode(buildSrcdoc(files))
     setHasRun(true)
     setIframeKey(k => k + 1)   // remount = clean slate
+    if (activeTab === 'js' || language === 'js') {
+      setRightTab('console')
+    }
+  }
+
+  // ── Reload: compile latest code and reload iframe ──
+  const handleReloadPreview = () => {
+    setConsoleLogs([])
+    setCompiledCode(buildSrcdoc(files))
+    setIframeKey(k => k + 1)
   }
 
   // ── Reset to defaults ───────────────────────────
@@ -157,7 +252,10 @@ export default function CodeSandbox({
     const fresh = { ...DEFAULT_FILES, ...defaultFiles }
     setFiles(fresh)
     editorRef.current?.setValue(fresh[activeTab])
-    setHasRun(false)
+    setConsoleLogs([])
+    setRightTab('preview')
+    setCompiledCode(buildSrcdoc(fresh))
+    setHasRun(true)
     setIframeKey(k => k + 1)
   }
 
@@ -196,7 +294,6 @@ export default function CodeSandbox({
     onComplete?.()
   }
 
-  const srcdoc = buildSrcdoc(files)
 
   // ────────────────────────────────────────────────
   // Render
@@ -205,10 +302,11 @@ export default function CodeSandbox({
     <div className="flex flex-col h-screen bg-[#06080F] overflow-hidden text-zinc-300 font-sans relative">
 
       {/* ── WORKSPACE ── */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* ── WORKSPACE ── */}
+      <PanelGroup direction="horizontal" className="flex-1">
 
         {/* ── LEFT: Instructions ── */}
-        <aside className="w-[30%] min-w-[250px] bg-[#0A0B1A] border-r-2 border-[#1E293B] flex flex-col overflow-hidden relative">
+        <Panel defaultSize={30} minSize={20} className="bg-[#0A0B1A] flex flex-col overflow-hidden relative">
           
           {/* Top Bar for Back Button */}
           {backHref && (
@@ -305,10 +403,12 @@ export default function CodeSandbox({
               )}
             </div>
           </div>
-        </aside>
+        </Panel>
+
+        <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
 
         {/* ── MIDDLE: Editor ── */}
-        <section className="flex-1 flex flex-col bg-[#011C3A] border-r-2 border-[#1E293B] overflow-hidden relative">
+        <Panel defaultSize={38} minSize={20} className="flex flex-col bg-[#011C3A] overflow-hidden relative">
           {/* Tab bar */}
           <div className="flex items-center px-0 bg-[#0A0B1A]">
             {tabs.map(tab => {
@@ -378,40 +478,107 @@ export default function CodeSandbox({
                 )}
              </div>
           </div>
-        </section>
+        </Panel>
 
-        {/* ── RIGHT: Preview ── */}
-        <aside className="w-[32%] min-w-[300px] flex flex-col bg-[#E9EEF5] overflow-hidden">
-          {/* Top Bar */}
-          <div className="px-4 py-2 bg-[#0A0B1A] flex items-center gap-3">
-            <RotateCcw size={14} className="text-zinc-500 cursor-pointer" onClick={() => hasRun && setIframeKey(k => k+1)} />
-            <div className="bg-[#181D31] text-zinc-300 text-xs px-4 py-1.5 rounded-full w-full max-w-[200px] flex items-center">
-              index.html
+        <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
+
+        {/* ── RIGHT: Preview & Console ── */}
+        <Panel defaultSize={32} minSize={20} className="flex flex-col bg-[#0A0B1A] overflow-hidden">
+          {/* Tabs bar */}
+          <div className="flex items-center justify-between px-4 py-2 bg-[#0A0B1A] border-b border-[#1E293B]">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRightTab('preview')}
+                className={`text-sm font-bold px-3 py-1 rounded transition-colors ${
+                  rightTab === 'preview' ? 'bg-[#181D31] text-white' : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+              >
+                Preview
+              </button>
+              <button
+                onClick={() => setRightTab('console')}
+                className={`text-sm font-bold px-3 py-1 rounded transition-colors flex items-center gap-1.5 ${
+                  rightTab === 'console' ? 'bg-[#181D31] text-white' : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+              >
+                Console
+                {consoleLogs.length > 0 && (
+                  <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded-full font-bold">
+                    {consoleLogs.length}
+                  </span>
+                )}
+              </button>
             </div>
+            
+            {rightTab === 'preview' ? (
+              <RotateCcw size={14} className="text-zinc-500 cursor-pointer hover:text-white" onClick={handleReloadPreview} />
+            ) : (
+              <button
+                onClick={() => setConsoleLogs([])}
+                className="text-xs text-zinc-500 hover:text-zinc-300 uppercase tracking-widest font-bold"
+              >
+                Clear
+              </button>
+            )}
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 w-full h-full relative flex items-center justify-center">
-             {!hasRun ? (
-               <div className="flex flex-col items-center text-[#64748B] text-center p-8 max-w-xs">
-                  <TerminalSquare size={48} className="mb-4 text-[#94A3B8]" />
-                  <p className="text-sm">
-                    Your code results will appear here when you <strong>Run</strong> the project.
-                  </p>
-               </div>
-             ) : (
-               <iframe
-                 key={iframeKey}
-                 ref={iframeRef}
-                 srcDoc={srcdoc}
-                 sandbox="allow-scripts"
-                 className="w-full h-full bg-white border-none"
-                 title="Code Preview"
-               />
-             )}
+          <div className="flex-1 w-full h-full relative bg-[#06080F]">
+            {/* The iframe is always in the DOM but hidden when not in preview tab */}
+            <div className={rightTab === 'preview' ? 'w-full h-full' : 'absolute inset-0 pointer-events-none opacity-0 invisible'}>
+              {!hasRun ? (
+                <div className="flex flex-col items-center justify-center h-full text-[#64748B] text-center p-8 max-w-xs mx-auto">
+                   <TerminalSquare size={48} className="mb-4 text-[#94A3B8]" />
+                   <p className="text-sm">
+                     Your code results will appear here when you <strong>Run</strong> the project.
+                   </p>
+                </div>
+              ) : (
+                <iframe
+                  key={iframeKey}
+                  ref={iframeRef}
+                  srcDoc={compiledCode}
+                  sandbox="allow-scripts"
+                  className="w-full h-full bg-white border-none"
+                  title="Code Preview"
+                />
+              )}
+            </div>
+
+            {/* The Console container, visible when active */}
+            {rightTab === 'console' && (
+              <div className="w-full h-full flex flex-col p-4 font-mono text-sm overflow-y-auto bg-[#070913] text-zinc-300 select-text absolute inset-0">
+                {consoleLogs.length === 0 ? (
+                  <div className="text-zinc-600 text-center my-auto flex flex-col items-center justify-center gap-2">
+                     <TerminalSquare size={32} className="text-zinc-700" />
+                     <span>Console is empty. Run your code to see logs.</span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {consoleLogs.map((log, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-start gap-2 border-b border-[#1E293B]/40 pb-2 ${
+                          log.type === 'error'
+                            ? 'text-red-400 bg-red-950/20 px-2 py-1 rounded border-l-2 border-red-500'
+                            : log.type === 'warn'
+                              ? 'text-yellow-400 bg-yellow-950/20 px-2 py-1 rounded border-l-2 border-yellow-500'
+                              : 'text-emerald-400'
+                        }`}
+                      >
+                        <span className="text-zinc-600 text-xs shrink-0 select-none">
+                          [{log.timestamp.toLocaleTimeString()}]
+                        </span>
+                        <span className="whitespace-pre-wrap break-all">{log.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </aside>
-      </div>
+        </Panel>
+      </PanelGroup>
 
       {/* ── COMPLETION BANNER ── */}
       {showBanner && (

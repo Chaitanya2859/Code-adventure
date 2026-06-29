@@ -34,6 +34,7 @@ export const completedExerciseTable = pgTable("completedExercise", {
   chapterId: integer(),
   exerciseId: varchar().notNull(),
   userId: varchar(),
+  completedAt: timestamp().defaultNow(),
 });
 
 

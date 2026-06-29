@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import { Skeleton } from "@/components/ui/skeleton"
+import DinoLoader from "@/app/components/DinoLoader"
 
  type Course={
     id: number,
@@ -22,10 +23,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 
     const [courseList, setCourseList]= useState<Course[]>([])
     const [loading, setLoading]= useState(false)
-    useEffect(()=>{
-        getAllCourses()
-    },[])
-
     const getAllCourses= async ()=>{
         setLoading(true)
         const res = await axios.get('/api/course')
@@ -33,20 +30,19 @@ import { Skeleton } from "@/components/ui/skeleton"
         setCourseList(res?.data)
     }
 
+    useEffect(()=>{
+        getAllCourses()
+    },[])
+
   return (
-    <div className="grid grid-cols-1 cursor-pointer mx-8 px-8 py-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-        { loading ? 
-            [1,2,3,4,5,6].map((item) => (
-                <div key={item} className="mx-4 rounded-xl p-4 space-y-3">
-                    <Skeleton className="h-40 w-full rounded-t-md" />
-                    <Skeleton className="h-8 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-10 w-24 rounded-xl" />
-                </div>
-            ))
-        :
-        courseList?.map((key)=>(
+    <div className="w-full">
+      {loading ? (
+        <div className="flex justify-center items-center py-20 w-full">
+          <DinoLoader size={200} text="Loading Courses..." />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 cursor-pointer mx-8 px-8 py-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+          {courseList?.map((key)=>(
             <Link href={'/courses/' + key.courseId}  key={key.courseId} >
             <div className=" mx-4 rounded-xl hover:bg-zinc-900 p-4">
                 <Image src={(key?.banner).trimEnd()} alt={key?.title} unoptimized width={400} className="h-35 w-full rounded-t-md" height={400} />
@@ -60,8 +56,9 @@ import { Skeleton } from "@/components/ui/skeleton"
                 </div>
             </div>
             </Link>
-        ))
-        }
+          ))}
+        </div>
+      )}
     </div>
   )
 }

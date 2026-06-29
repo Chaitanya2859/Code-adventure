@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link"
 
 const Hero = () => {
   return (
@@ -21,7 +22,9 @@ const Hero = () => {
                 }
             }>Coding Adventure</h2>
             <h2 className="mt-7 font-game text-3xl">Beginner friendly coding courses and projects</h2>
-            <Button variant="pixel" className="font-game text-3xl mt-4 px-8 py-6 ">Get Started</Button>
+            <Link href="/courses">
+              <Button variant="pixel" className="font-game text-3xl mt-4 px-8 py-6 cursor-pointer">Get Started</Button>
+            </Link>
         </div>
     </div>
   )

@@ -34,60 +34,10 @@ const projects = [
     chapters: 7,
   },
   {
-    id: 3,
-    title: "React Todo Board",
-    desc: "Build a Kanban-style todo board with drag-and-drop support using React hooks and local state.",
-    difficulty: "Intermediate",
-    xp: 500,
-    tech: ["React"],
-    banner: "/hero11.gif",
-    chapters: 8,
-  },
-  {
-    id: 4,
-    title: "Python Data Dashboard",
-    desc: "Scrape public data with Python and visualise it in a browser-friendly dashboard with charts.",
-    difficulty: "Advanced",
-    xp: 700,
-    tech: ["Python"],
-    banner: "/hero13.gif",
-    chapters: 10,
-  },
-  {
-    id: 5,
-    title: "REST API with Node.js",
-    desc: "Design and build a fully functional REST API for a blog platform with authentication using Express & JWT.",
-    difficulty: "Advanced",
-    xp: 800,
-    tech: ["Node.js"],
-    banner: "/hero14.gif",
-    chapters: 12,
-  },
-  {
-    id: 6,
-    title: "CSS Animation Playground",
-    desc: "Master keyframes, transitions, and transforms by building an interactive animation showcase page.",
-    difficulty: "Beginner",
-    xp: 250,
-    tech: ["CSS"],
-    banner: "/hero6.gif",
-    chapters: 4,
-  },
-  {
-    id: 7,
-    title: "Chat App UI Clone",
-    desc: "Recreate a Discord-style chat interface with channels, messages, and user avatars using React.",
-    difficulty: "Intermediate",
-    xp: 550,
-    tech: ["React"],
-    banner: "/hero-8.gif",
-    chapters: 9,
-  },
-  {
     id: 8,
     title: "City Weather App",
     desc: "Fetch live weather data from a public API and display it with animated weather icons and a city map.",
-    difficulty: "Intermediate",
+    difficulty: "Advanced",
     xp: 450,
     tech: ["JavaScript", "CSS"],
     banner: "/city.gif",
@@ -167,6 +117,10 @@ export default function ProjectsPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="flex flex-col items-center justify-center py-12 pb-24 font-game">
+        <h2 className="text-3xl text-zinc-500 animate-pulse">More coming soon...</h2>
       </div>
     </div>
   )

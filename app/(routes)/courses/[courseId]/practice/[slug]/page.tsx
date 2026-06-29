@@ -2,12 +2,18 @@ import CodeSandbox from "@/app/components/CodeSandbox"
 import { db } from "@/config/db"
 import { chapterTable, completedExerciseTable } from "@/config/userschema"
 import { eq, and } from "drizzle-orm"
+import htmlExercises from "@/html-exercises"
+import cssExercises from "@/css-exercises"
+import jsExercises from "@/js-exercises"
 
 // ────────────────────────────────────────────────────
 // Static exercise data (keyed by slug)
 // In production, pull this from DB or a content layer
 // ────────────────────────────────────────────────────
 const exerciseData: Record<string, any> = {
+  ...htmlExercises,
+  ...cssExercises,
+  ...jsExercises,
   'hello-world': {
     numberTitle: '01. The Silent Void',
     mainHeading: 'Lighting the Spark',
@@ -146,9 +152,17 @@ export default async function PracticePage({
     isAlreadyCompleted = existing.length > 0;
   }
   
-  // Only show HTML tab if the course is HTML (courseId = 1)
+  // Only show relevant tabs based on course
   const isHtmlCourse = courseId === '1'
-  const tabs = isHtmlCourse ? ['html' as const] : undefined
+  const isCssCourse = courseId === '2'
+  const isJsCourse = courseId === '6'
+  const tabs = isHtmlCourse 
+    ? ['html' as const] 
+    : isCssCourse 
+      ? ['html' as const, 'css' as const] 
+      : isJsCourse
+        ? ['html' as const, 'js' as const]
+        : undefined
 
   // Calculate Navigation
   const slugs = Object.keys(exerciseData).filter(k => k !== '_default')

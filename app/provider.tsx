@@ -22,17 +22,17 @@ const [userDetail,setUserDetail]= useState()
 
   const hasCreatedUser = React.useRef(false);
 
+  const createNewUser = async () => {
+    const result = await axios.post('/api/user/', {});
+    setUserDetail(result?.data);
+  }
+
   useEffect(() => {
     if (user && !hasCreatedUser.current) {
       hasCreatedUser.current = true;
       createNewUser();
     }
   }, [user]);
-
-  const createNewUser = async () => {
-    const result = await axios.post('/api/user/', {});
-    setUserDetail(result?.data);
-  }
 
   return (
     <NextThemesProvider {...props}>

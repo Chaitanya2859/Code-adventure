@@ -16,16 +16,6 @@ const channels = [
     desc: "Get instant answers to common coding questions 24/7 from our smart assistant.",
   },
   {
-    icon: "/star2.gif",
-    title: "Community Discord",
-    desc: "Join 4,000+ learners. Share code, ask questions, and build projects together.",
-  },
-  {
-    icon: "/fire.gif",
-    title: "Weekly Office Hours",
-    desc: "Live Q&A sessions every Friday at 6 PM IST with our instructors.",
-  },
-  {
     icon: "/tresure.gif",
     title: "Bug Bounty",
     desc: "Found a bug or issue in a lesson? Report it and earn bonus XP.",
@@ -33,9 +23,7 @@ const channels = [
 ]
 
 const team = [
-  { name: "Arjun Sharma", role: "Founder & Lead Instructor", avatar: "/trainer.gif" },
-  { name: "Priya Mehta", role: "Curriculum Designer", avatar: "/alex_walk.gif" },
-  { name: "Rahul Nair", role: "Community Manager", avatar: "/logo.gif" },
+  { name: "Chaitanya Bhagat", role: "Creator", avatar: "/trainer.gif" },
 ]
 
 export default function ContactUsPage() {
@@ -130,9 +118,9 @@ export default function ContactUsPage() {
             </div>
           </div>
 
-          {/* Team */}
+          {/* Creator */}
           <div>
-            <h2 className="font-game text-4xl mb-4">Meet the Team</h2>
+            <h2 className="font-game text-4xl mb-4">Creator</h2>
             <div className="flex flex-col gap-4">
               {team.map((member) => (
                 <div

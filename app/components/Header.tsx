@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/navigation-menu"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { UserButton, useUser } from "@clerk/nextjs";
+import { cn } from "@/lib/utils"
 import Link from "next/link";
+import React, { useState, useEffect } from "react";
 
 
 const courses = [
@@ -59,12 +61,24 @@ const courses = [
 
 const Header = () => {
     const {user} = useUser()
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null;
+    }
+
   return (
     <div className="py-4 px-16  w-full flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-        <img src="/crown.png" alt="Logo" className="w-10 h-10" />
-        <h2 className="font-game text-3xl mt-2">Code Adventure</h2>
-        </div>
+        <Link href="/">
+          <div className="flex gap-4 items-center cursor-pointer">
+            <img src="/crown.png" alt="Logo" className="w-10 h-10" />
+            <h2 className="font-game text-3xl mt-2">Code Adventure</h2>
+          </div>
+        </Link>
 
         <NavigationMenu>
   <NavigationMenuList className="gap-8 font-game text-2xl">
@@ -73,32 +87,38 @@ const Header = () => {
       <NavigationMenuContent>
         <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
             {courses.map((course, index)=>(
-                <Link href={course.path} key={index}>
-                  <NavigationMenuLink asChild>
-                    <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
-                        <h2 className="font-bold">{course.name}</h2>
-                        <p className="text-xs text-zinc-500">{course.desc}</p>
-                    </div>
-                  </NavigationMenuLink>
+              <NavigationMenuLink asChild key={index}>
+                <Link href={course.path}>
+                  <div className="p-2 hover:bg-accent  rounded-lg cursor-pointer h-full">
+                      <h2 className="font-bold">{course.name}</h2>
+                      <p className="text-xs text-zinc-500">{course.desc}</p>
+                  </div>
                 </Link>
+              </NavigationMenuLink>
             ))}
         </ul>
       </NavigationMenuContent>
     </NavigationMenuItem>
     <NavigationMenuItem>
-      <Link href={'/projects'} passHref>
-        <NavigationMenuLink className={navigationMenuTriggerStyle() + " font-game text-2xl bg-transparent"}>Projects</NavigationMenuLink>
-      </Link>
+      <NavigationMenuLink asChild>
+        <Link href={'/projects'} className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+          Projects
+        </Link>
+      </NavigationMenuLink>
     </NavigationMenuItem>
     <NavigationMenuItem>
-      <Link href={'/pricing'} passHref>
-        <NavigationMenuLink className={navigationMenuTriggerStyle() + " font-game text-2xl bg-transparent"}>Pricing</NavigationMenuLink>
-      </Link>
+      <NavigationMenuLink asChild>
+        <Link href={'/pricing'} className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+          Pricing
+        </Link>
+      </NavigationMenuLink>
     </NavigationMenuItem>
     <NavigationMenuItem>
-      <Link href={'/contactus'} passHref>
-        <NavigationMenuLink className={navigationMenuTriggerStyle() + " font-game text-2xl bg-transparent"}>Contact us</NavigationMenuLink>
-      </Link>
+      <NavigationMenuLink asChild>
+        <Link href={'/contactus'} className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+          Contact us
+        </Link>
+      </NavigationMenuLink>
     </NavigationMenuItem>
   </NavigationMenuList>
 </NavigationMenu>

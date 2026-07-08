@@ -1,58 +1,52 @@
-import { db } from "@/config/db";
-import { completedExerciseTable, enrolledCourseTable } from "@/config/userschema";
+import pool from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
-import { eq, and } from "drizzle-orm";
-import { currentUser } from "@clerk/nextjs/server";
+import { getSession } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const authUser = await getSession();
+        if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
         const body = await req.json();
         const { courseId, chapterId, exerciseSlug, xp } = body;
+        const email = authUser.email;
 
         // Check if already completed
-        const existing = await db.select().from(completedExerciseTable).where(
-            and(
-                eq(completedExerciseTable.courseId, Number(courseId)),
-                eq(completedExerciseTable.exerciseId, exerciseSlug),
-                eq(completedExerciseTable.userId, user.primaryEmailAddress?.emailAddress ?? '')
-            )
+        const existing = await pool.query(
+            `SELECT * FROM "completedExercise"
+             WHERE "courseId" = $1 AND "exerciseId" = $2 AND "userId" = $3`,
+            [Number(courseId), exerciseSlug, email]
         );
 
-        if (existing.length > 0) {
+        if (existing.rows.length > 0) {
             return NextResponse.json({ success: true, message: "Already completed" });
         }
 
         // Insert new completion
-        await db.insert(completedExerciseTable).values({
-            courseId: Number(courseId),
-            chapterId: Number(chapterId),
-            exerciseId: exerciseSlug,
-            userId: user.primaryEmailAddress?.emailAddress ?? ''
-        });
-
-        // Add XP to enrolledCourseTable
-        const enroll = await db.select().from(enrolledCourseTable).where(
-            and(
-                eq(enrolledCourseTable.courseId, Number(courseId)),
-                eq(enrolledCourseTable.userId, user.primaryEmailAddress?.emailAddress ?? '')
-            )
+        await pool.query(
+            `INSERT INTO "completedExercise" ("courseId", "chapterId", "exerciseId", "userId")
+             VALUES ($1, $2, $3, $4)`,
+            [Number(courseId), Number(chapterId), exerciseSlug, email]
         );
 
-        if (enroll.length > 0) {
-            const currentXp = enroll[0].xpEarned || 0;
-            await db.update(enrolledCourseTable).set({
-                xpEarned: currentXp + Number(xp)
-            }).where(eq(enrolledCourseTable.id, enroll[0].id));
+        // Add XP to enrolledCourse
+        const enroll = await pool.query(
+            `SELECT * FROM "enrolledCourse" WHERE "courseId" = $1 AND "userId" = $2`,
+            [Number(courseId), email]
+        );
+
+        if (enroll.rows.length > 0) {
+            const currentXp = enroll.rows[0].xpEarned || 0;
+            await pool.query(
+                `UPDATE "enrolledCourse" SET "xpEarned" = $1 WHERE id = $2`,
+                [currentXp + Number(xp), enroll.rows[0].id]
+            );
         } else {
-             // Not enrolled yet? Enroll them
-             await db.insert(enrolledCourseTable).values({
-                 courseId: Number(courseId),
-                 userId: user.primaryEmailAddress?.emailAddress ?? '',
-                 xpEarned: Number(xp)
-             });
+            // Not enrolled yet — enroll them
+            await pool.query(
+                `INSERT INTO "enrolledCourse" ("courseId", "userId", "xpEarned") VALUES ($1, $2, $3)`,
+                [Number(courseId), email, Number(xp)]
+            );
         }
 
         return NextResponse.json({ success: true });

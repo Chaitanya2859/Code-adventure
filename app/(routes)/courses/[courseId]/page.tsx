@@ -6,7 +6,6 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import CourseStatus from "./_component/CourseStatus"
 import Upgrade from "../../dashboard/_component/Upgrade"
-import CommunityHelpSection from "./_component/CommunityHelpSection"
 
 type Course={
     id: number,
@@ -63,15 +62,14 @@ const course = () => {
         loading={loading}
         courseDetail= {courseDetail}
         />
-        <div className="grid grid-cols-3 gap-7 p-10 md:px-24 lg:px-40">
-            <div className="col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-7 p-4 sm:p-10 md:px-24 lg:px-40">
+            <div className="col-span-1 md:col-span-2">
                 <CourseChapters loading={loading}
         courseDetail= {courseDetail} />
             </div>
             <div className="">
                 <CourseStatus courseDetail= {courseDetail} />
                 <Upgrade />
-                <CommunityHelpSection />
             </div>
         </div>
     </div>

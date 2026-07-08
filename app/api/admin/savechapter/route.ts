@@ -1,8 +1,7 @@
-import { db } from "@/config/db";
-import { chapterTable } from "@/config/userschema";
+import pool from "@/config/db";
 import { NextRequest } from "next/server";
 
-const data= [
+const data = [
   {
     "id": 1,
     "name": "Introduction to React",
@@ -76,7 +75,7 @@ const data= [
   {
     "id": 8,
     "name": "Forms & Controlled Inputs",
-    "desc": "Manage form elements using React’s state and handlers.",
+    "desc": "Manage form elements using React's state and handlers.",
     "exercises": [
       { "name": "Controlled Input", "slug": "controlled-input", "xp": 10, "difficulty": "easy" },
       { "name": "Handle Submit", "slug": "handle-submit", "xp": 10, "difficulty": "easy" },
@@ -93,19 +92,16 @@ const data= [
       { "name": "Link Between Pages", "slug": "link-between-pages", "xp": 10, "difficulty": "easy" }
     ]
   }
-]
-
+];
 
 export async function GET(req: NextRequest) {
   try {
     for (const item of data) {
-      await db.insert(chapterTable).values({
-        courseId: 3,
-        chapterId: item.id,
-        title: item.name,
-        desc: item.desc,
-        exercises: item.exercises
-      });
+      await pool.query(
+        `INSERT INTO chapters ("courseId", "chapterId", title, desc, exercises)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [3, item.id, item.name, item.desc, JSON.stringify(item.exercises)]
+      );
     }
 
     return Response.json({ message: "course inserted successfully" });

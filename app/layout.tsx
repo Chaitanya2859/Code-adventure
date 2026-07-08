@@ -2,10 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Jersey_10 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-
-import {
-  ClerkProvider,
-} from '@clerk/nextjs'
 import Provider from "./provider";
 import { Toaster } from "sonner";
 
@@ -31,23 +27,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
     <html lang="en" suppressHydrationWarning className="dark">
       <body suppressHydrationWarning
         className={`${geistSans.variable} ${gameFont.variable} antialiased`}
-      >          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-             <Provider attribute="class" defaultTheme="system">
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Provider attribute="class" defaultTheme="system">
             {children}
             <Toaster />
-            </Provider>
-          </ThemeProvider>
+          </Provider>
+        </ThemeProvider>
       </body>
     </html>
-    </ClerkProvider>
   );
 }

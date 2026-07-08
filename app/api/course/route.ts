@@ -1,37 +1,47 @@
-import { db } from "@/config/db";
-import { chapterTable, courseTable, enrolledCourseTable, completedExerciseTable } from "@/config/userschema";
+import pool from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
-import { currentUser } from "@clerk/nextjs/server";
+import { getSession } from "@/lib/auth";
 
-
-export async function GET(req:NextRequest) {
-
-    const user= await currentUser()
+export async function GET(req: NextRequest) {
+    const authUser = await getSession();
+    const email = authUser?.email ?? '';
 
     const courseId = req.nextUrl.searchParams.get("courseid");
-    if(courseId){
+
+    if (courseId) {
         const [res, chapterResult, enrollCourse, completedEx] = await Promise.all([
-            db.select().from(courseTable).where(eq(courseTable.courseId, Number(courseId))),
-            db.select().from(chapterTable).where(eq(chapterTable.courseId, Number(courseId))),
-            db.select().from(enrolledCourseTable).where(and(eq(enrolledCourseTable.courseId, Number(courseId)),(eq(enrolledCourseTable.userId, user?.primaryEmailAddress?.emailAddress ?? '')))),
-            db.select().from(completedExerciseTable).where(and(eq(completedExerciseTable.courseId, Number(courseId)),(eq(completedExerciseTable.userId, user?.primaryEmailAddress?.emailAddress ?? ''))))
+            pool.query(
+                `SELECT * FROM courses WHERE "courseId" = $1`,
+                [Number(courseId)]
+            ),
+            pool.query(
+                `SELECT * FROM chapters WHERE "courseId" = $1`,
+                [Number(courseId)]
+            ),
+            pool.query(
+                `SELECT * FROM "enrolledCourse" WHERE "courseId" = $1 AND "userId" = $2`,
+                [Number(courseId), email]
+            ),
+            pool.query(
+                `SELECT * FROM "completedExercise" WHERE "courseId" = $1 AND "userId" = $2`,
+                [Number(courseId), email]
+            ),
         ]);
 
-        const isEnrolled = enrollCourse.length > 0;
+        const isEnrolled = enrollCourse.rows.length > 0;
 
         return NextResponse.json({
-            ...res[0],
-            chapter: chapterResult,
+            ...res.rows[0],
+            chapter: chapterResult.rows,
             userEnroll: isEnrolled,
-            completedExercises: completedEx.map(c => c.exerciseId),
-            earnedXp: isEnrolled ? enrollCourse[0].xpEarned : 0
+            completedExercises: completedEx.rows.map((c: any) => c.exerciseId),
+            earnedXp: isEnrolled ? enrollCourse.rows[0].xpEarned : 0,
         }, {
             headers: { 'Cache-Control': 's-maxage=0' }
         });
     } else {
-        const res = await db.select().from(courseTable);
-        return NextResponse.json(res, {
+        const res = await pool.query(`SELECT * FROM courses`);
+        return NextResponse.json(res.rows, {
             headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' }
         });
     }

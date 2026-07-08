@@ -2,47 +2,52 @@
 
 import React, { useEffect, useState } from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { useUser } from "@clerk/nextjs";
-import axios from 'axios'
+import axios from 'axios';
 import { UserDetailsContext } from "@/context/UserDetailsContext";
 import Header from "./components/Header";
 import { usePathname } from "next/navigation";
-
+import { SessionUser } from "@/lib/auth";
 
 export default function Provider({
   children,
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
 
-const {user}= useUser();
-const pathname = usePathname();
-const hiddenHeader = pathname.includes('/practice/');
+  const pathname = usePathname();
+  const hiddenHeader = pathname.includes('/practice/');
 
-const [userDetail,setUserDetail]= useState()
+  const [userDetail, setUserDetail] = useState<any>();
+  const [authUser, setAuthUser] = useState<SessionUser | null>(null);
 
   const hasCreatedUser = React.useRef(false);
 
-  const createNewUser = async () => {
-    const result = await axios.post('/api/user/', {});
-    setUserDetail(result?.data);
-  }
-
+  // Fetch the current auth session on mount
   useEffect(() => {
-    if (user && !hasCreatedUser.current) {
-      hasCreatedUser.current = true;
-      createNewUser();
-    }
-  }, [user]);
+    axios.get('/api/auth/me')
+      .then(res => {
+        if (res.data.user) {
+          setAuthUser(res.data.user);
+          // Also sync user profile to our users table
+          if (!hasCreatedUser.current) {
+            hasCreatedUser.current = true;
+            axios.post('/api/user/', {})
+              .then(r => setUserDetail(r.data))
+              .catch(() => {});
+          }
+        }
+      })
+      .catch(() => setAuthUser(null));
+  }, []);
 
   return (
     <NextThemesProvider {...props}>
-        <UserDetailsContext.Provider value={{userDetail,setUserDetail}}>
-            {!hiddenHeader && (
-              <div className="flex flex-col items-center">
-                <Header />
-              </div>
-            )}
-      {children}
+      <UserDetailsContext.Provider value={{ userDetail, setUserDetail, authUser, setAuthUser }}>
+        {!hiddenHeader && (
+          <div className="flex flex-col items-center">
+            <Header />
+          </div>
+        )}
+        {children}
       </UserDetailsContext.Provider>
     </NextThemesProvider>
   );

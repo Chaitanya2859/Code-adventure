@@ -71,19 +71,21 @@ const CourseChapters = ({loading , courseDetail}: Props) => {
             {chapter.exercises.map((exercise, idx)=>{
                 const isCompleted = courseDetail?.completedExercises?.includes(exercise.slug)
 
-                return <div className="flex p-4  text-2xl justify-between hover:bg-zinc-800 rounded-2xl" key={idx}>
-                    <div className="flex gap-4">
-                    <h2> Exercise: {idx+1} : </h2>
-                    <h1> {exercise.name}</h1>
+                return <div className="flex p-4 text-lg md:text-2xl justify-between items-center hover:bg-zinc-800 rounded-2xl" key={idx}>
+                    <div className="flex gap-2 md:gap-4 items-center">
+                    <h2> Exercise {idx+1}: </h2>
+                    <h1 className="line-clamp-1"> {exercise.name}</h1>
                     </div>
-                        <Link href={`/courses/${courseDetail?.courseId}/practice/${exercise.slug}`}>
+                        <Link href={`/courses/${courseDetail?.courseId}/practice/${exercise.slug}`} className="shrink-0 ml-4">
                             {isCompleted ? (
-                                <Button className="font-game text-2xl bg-emerald-500 hover:bg-emerald-600 text-white border-4 border-b-8 border-emerald-700 active:border-b-4 active:mt-1">
-                                    Completed
+                                <Button className="font-game text-lg md:text-2xl bg-emerald-500 hover:bg-emerald-600 text-white border-4 border-b-8 border-emerald-700 active:border-b-4 active:mt-1 px-3 py-1 md:px-6 md:py-2">
+                                    <span className="hidden md:inline">Completed</span>
+                                    <span className="md:hidden">✓</span>
                                 </Button>
                             ) : (
-                                <Button className="font-game text-2xl bg-yellow-400 hover:bg-yellow-500 text-black border-4 border-b-8 border-yellow-600 active:border-b-4 active:mt-1">
-                                    Practice Now
+                                <Button className="font-game text-lg md:text-2xl bg-yellow-400 hover:bg-yellow-500 text-black border-4 border-b-8 border-yellow-600 active:border-b-4 active:mt-1 px-3 py-1 md:px-6 md:py-2">
+                                    <span className="hidden md:inline">Practice Now</span>
+                                    <span className="md:hidden">-&gt;</span>
                                 </Button>
                             )}
                         </Link>

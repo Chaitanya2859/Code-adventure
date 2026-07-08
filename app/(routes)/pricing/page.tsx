@@ -65,24 +65,7 @@ const plans = [
   },
 ]
 
-const faqs = [
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes — Adventurer is billed monthly and you can cancel before your next renewal with no penalty.",
-  },
-  {
-    q: "Is there a student discount?",
-    a: "Absolutely. Email us your student ID at hello@codeadventure.dev and we'll apply a 40% discount.",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept UPI, all major credit/debit cards, and net banking through Razorpay.",
-  },
-  {
-    q: "Do certificates expire?",
-    a: "No — your completion certificates are permanent and shareable via a public link.",
-  },
-]
+
 
 export default function PricingPage() {
   return (
@@ -163,18 +146,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* FAQ */}
-      <div className="px-8 md:px-24 pb-16">
-        <h2 className="font-game text-4xl mb-8">Frequently Asked Questions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {faqs.map((faq) => (
-            <div key={faq.q} className="bg-zinc-900 border-2 border-zinc-700 rounded-xl p-6 font-game">
-              <h3 className="text-2xl mb-2">{faq.q}</h3>
-              <p className="text-zinc-400 text-lg">{faq.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

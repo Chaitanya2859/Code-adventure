@@ -1,27 +1,27 @@
-import { db } from "@/config/db";
-import { usersTable } from "@/config/userschema";
-import { currentUser } from "@clerk/nextjs/server";
+import pool from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { getSession } from "@/lib/auth";
 
-export async function POST(req: NextRequest){
-    const user = await currentUser()
-
-    // if user already exist
-    const users= await db.select().from(usersTable)
-    // @ts-ignore
-    .where(eq(usersTable.email,user?.primaryEmailAddress?.emailAddress))
-
-    // if user does not exist create new user
-    if(users?.length <=0){
-        const newUser= {
-            name: user?.fullName ?? '',
-            email : user?.primaryEmailAddress?.emailAddress ?? ''
-        }
-        const res= await db.insert(usersTable).values(newUser).returning()
-        return NextResponse.json(res[0])
+export async function POST(req: NextRequest) {
+    const authUser = await getSession();
+    if (!authUser) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json(users[0])
-    //Return user info
+    // Check if user already exists
+    const existing = await pool.query(
+        `SELECT * FROM users WHERE email = $1`,
+        [authUser.email]
+    );
+
+    // If user does not exist, create them
+    if (existing.rows.length <= 0) {
+        const res = await pool.query(
+            `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *`,
+            [authUser.name, authUser.email]
+        );
+        return NextResponse.json(res.rows[0]);
+    }
+
+    return NextResponse.json(existing.rows[0]);
 }

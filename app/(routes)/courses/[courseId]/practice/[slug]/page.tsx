@@ -1,7 +1,5 @@
 import CodeSandbox from "@/app/components/CodeSandbox"
-import { db } from "@/config/db"
-import { chapterTable, completedExerciseTable, enrolledCourseTable } from "@/config/userschema"
-import { eq, and } from "drizzle-orm"
+import pool from "@/config/db"
 import htmlExercises from "@/html-exercises"
 import cssExercises from "@/css-exercises"
 import jsExercises from "@/js-exercises"
@@ -134,7 +132,7 @@ function getInstruction(slug: string) {
 // ────────────────────────────────────────────────────
 // Page
 // ────────────────────────────────────────────────────
-import { currentUser } from "@clerk/nextjs/server"
+import { getSession } from "@/lib/auth"
 
 export default async function PracticePage({
   params,
@@ -144,25 +142,24 @@ export default async function PracticePage({
   const { courseId, slug } = await params
   const exercise = getInstruction(slug)
   
-  const user = await currentUser();
+  const authUser = await getSession();
   let isAlreadyCompleted = false;
   let userGlobalXp = 0;
   
-  if (user?.primaryEmailAddress?.emailAddress) {
-    const email = user.primaryEmailAddress.emailAddress;
-    const existing = await db.select().from(completedExerciseTable).where(
-      and(
-        eq(completedExerciseTable.courseId, Number(courseId)),
-        eq(completedExerciseTable.exerciseId, slug),
-        eq(completedExerciseTable.userId, email)
-      )
-    );
-    isAlreadyCompleted = existing.length > 0;
+  if (authUser?.email) {
+    const email = authUser.email;
 
-    const enrollments = await db.select().from(enrolledCourseTable).where(
-      eq(enrolledCourseTable.userId, email)
+    const existing = await pool.query(
+      `SELECT * FROM "completedExercise" WHERE "courseId" = $1 AND "exerciseId" = $2 AND "userId" = $3`,
+      [Number(courseId), slug, email]
     );
-    userGlobalXp = enrollments.reduce((sum, item) => sum + (item.xpEarned || 0), 0);
+    isAlreadyCompleted = existing.rows.length > 0;
+
+    const enrollments = await pool.query(
+      `SELECT * FROM "enrolledCourse" WHERE "userId" = $1`,
+      [email]
+    );
+    userGlobalXp = enrollments.rows.reduce((sum: number, item: any) => sum + (item.xpEarned || 0), 0);
   }
   
   // Only show relevant tabs based on course

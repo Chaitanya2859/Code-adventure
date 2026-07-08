@@ -1,3 +1,7 @@
-import { drizzle } from 'drizzle-orm/neon-http';
+import { Pool } from 'pg';
 
-export const db = drizzle(process.env.DATABASE_URL!);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export default pool;

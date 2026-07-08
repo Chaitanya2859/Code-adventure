@@ -1,12 +1,12 @@
 'use client'
-import { useUser } from "@clerk/nextjs"
+import { useAuth } from "@/hooks/useAuth"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import axios from "axios"
 
 
 const UserCurrentStatus = () => {
-    const {user} = useUser()
+    const { user } = useAuth()
     const [stats, setStats] = useState({ xp: 0, badges: 0, streak: 0, level: 1, levelProgress: 0 })
     const [loading, setLoading] = useState(true)
 
@@ -29,16 +29,16 @@ const UserCurrentStatus = () => {
 
   return (
     <div className="bg-zinc-900 p-4 border-2 rounded-xl">
-        <div className="flex gap-6  justify-center items-center">
-        <Image src={'/trainer.gif'} alt='Your profile' width={60} height={60} unoptimized />
-        <h2 className="font-game">{(user?.primaryEmailAddress?.emailAddress?.length ?? 0) > 20 ? <div className="text-xl">{user?.primaryEmailAddress?.emailAddress} </div>: <div className="text-2xl">{user?.primaryEmailAddress?.emailAddress} </div>} </h2>
+        <div className="flex gap-4 md:gap-6 justify-center items-center">
+        <Image src={'/trainer.gif'} alt='Your profile' width={60} height={60} unoptimized className="w-10 h-10 md:w-[60px] md:h-[60px]" />
+        <h2 className="font-game">{(user?.email?.length ?? 0) > 20 ? <div className="text-lg md:text-xl">{user?.email} </div>: <div className="text-xl md:text-2xl">{user?.email} </div>} </h2>
         </div>
         
         <div className="grid gap-4 grid-cols-2 mt-4">
             <div className="">
-                <div className="flex items-center gap-4 ">
-                    <Image src={'/star2.gif'} className="mb-2" alt='Star' width={40} height={40} unoptimized />
-                    <h2 className="text-3xl font-game">{loading ? "..." : stats.xp}</h2>
+                <div className="flex items-center gap-2 md:gap-4 ">
+                    <Image src={'/star2.gif'} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" alt='Star' width={40} height={40} unoptimized />
+                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.xp}</h2>
                 </div>
                 <div className="flex items-center gap-3">
                     <h1 className="text-gray-500 text-lg mt-2 font-game">Total XP</h1>
@@ -46,9 +46,9 @@ const UserCurrentStatus = () => {
             </div>
             
             <div className="">
-                <div className="flex items-center gap-4">
-                    <Image src={'/tresure.gif'} alt='Badge' width={40} className="mb-2" height={40} unoptimized />
-                    <h2 className="text-3xl font-game">{loading ? "..." : stats.badges}</h2>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <Image src={'/tresure.gif'} alt='Badge' width={40} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" height={40} unoptimized />
+                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.badges}</h2>
                 </div>
                 <div className="flex items-center gap-3">
                     <h1 className="text-gray-500 text-lg mt-2 font-game">Badges</h1>
@@ -56,9 +56,9 @@ const UserCurrentStatus = () => {
             </div>
 
             <div className="">
-                <div className="flex items-center gap-4">
-                    <Image src={'/star.gif'} alt='Level' width={40} className="mb-2" height={40} unoptimized />
-                    <h2 className="text-3xl font-game">{loading ? "..." : stats.level}</h2>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <Image src={'/star.gif'} alt='Level' width={40} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" height={40} unoptimized />
+                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.level}</h2>
                 </div>
                 <div className="flex items-center gap-3">
                     <h1 className="text-gray-500 text-lg mt-2 font-game">User Level</h1>
@@ -66,9 +66,9 @@ const UserCurrentStatus = () => {
             </div>
 
             <div className="">
-                <div className="flex items-center gap-4">
-                    <Image src={'/fire.gif'} alt='Streak' width={40} className="mb-2" height={40} unoptimized />
-                    <h2 className="text-3xl font-game">{loading ? "..." : stats.streak}</h2>
+                <div className="flex items-center gap-2 md:gap-4">
+                    <Image src={'/fire.gif'} alt='Streak' width={40} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" height={40} unoptimized />
+                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.streak}</h2>
                 </div>
                 <div className="flex items-center gap-3">
                     <h1 className="text-gray-500 text-lg mt-2 font-game">Streak</h1>

@@ -7,28 +7,28 @@ const ExploreMoreOptions = [
     title: "Quiz Pack",
     desc: "Practice what you learned with bite-sized code challenges.",
     icon: "/heart.png",
-    path: "#"
+    path: "/coming-soon"
   },
   {
     id: 2,
     title: "Video Courses",
     desc: "Learn with structured video lessons taught step-by-step.",
     icon: "/smile.png",
-    path: "#"
+    path: "/coming-soon"
   },
   {
     id: 3,
     title: "Community Project",
     desc: "Build real-world apps by collaborating with the community.",
     icon: "/rainbow.png",
-    path: "/projects"
+    path: "/coming-soon"
   },
   {
     id: 4,
     title: "Community",
     desc: "Connect, share code, and discuss with fellow learners.",
     icon: "/plant.png",
-    path: "/community"
+    path: "/coming-soon"
   },
 ];
 

@@ -227,6 +227,7 @@ export default function CodeSandbox({
   const [showBanner, setShowBanner] = useState(false) // completion banner
 
   const [rightTab, setRightTab] = useState<'preview' | 'console'>('preview')
+  const [mobileTab, setMobileTab] = useState<'question' | 'code' | 'output'>('question')
   const [consoleLogs, setConsoleLogs] = useState<ConsoleLogEntry[]>([])
   
   const [compiledCode, setCompiledCode] = useState(() => buildSrcdoc({
@@ -339,15 +340,9 @@ export default function CodeSandbox({
   // ────────────────────────────────────────────────
   // Render
   // ────────────────────────────────────────────────
-  return (
-    <div className="flex flex-col h-screen bg-[#06080F] overflow-hidden text-zinc-300 font-sans relative">
 
-      {/* ── WORKSPACE ── */}
-      {/* ── WORKSPACE ── */}
-      <PanelGroup direction="horizontal" className="flex-1">
-
-        {/* ── LEFT: Instructions ── */}
-        <Panel defaultSize={30} minSize={20} className="bg-[#0A0B1A] flex flex-col overflow-hidden relative">
+  const renderInstructionsPanel = () => (
+    <div className="bg-[#0A0B1A] flex flex-col overflow-hidden relative h-full w-full">
           
           {/* Top Bar for Back Button */}
           {backHref && (
@@ -444,12 +439,11 @@ export default function CodeSandbox({
               )}
             </div>
           </div>
-        </Panel>
+        </div>
+  )
 
-        <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
-
-        {/* ── MIDDLE: Editor ── */}
-        <Panel defaultSize={38} minSize={20} className="flex flex-col bg-[#011C3A] overflow-hidden relative">
+  const renderEditorPanel = () => (
+    <div className="flex flex-col bg-[#011C3A] overflow-hidden relative h-full w-full">
           {/* Tab bar */}
           <div className="flex items-center px-0 bg-[#0A0B1A]">
             {tabs.map(tab => {
@@ -537,12 +531,11 @@ export default function CodeSandbox({
                 )}
              </div>
           </div>
-        </Panel>
+        </div>
+  )
 
-        <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
-
-        {/* ── RIGHT: Preview & Console ── */}
-        <Panel defaultSize={32} minSize={20} className="flex flex-col bg-[#0A0B1A] overflow-hidden">
+  const renderPreviewPanel = () => (
+    <div className="flex flex-col bg-[#0A0B1A] overflow-hidden h-full w-full">
           {/* Tabs bar */}
           <div className="flex items-center justify-between px-4 py-2 bg-[#0A0B1A] border-b border-[#1E293B]">
             <div className="flex gap-2">
@@ -636,8 +629,44 @@ export default function CodeSandbox({
               </div>
             )}
           </div>
-        </Panel>
-      </PanelGroup>
+        </div>
+  )
+
+  return (
+
+    <div className="flex flex-col h-[100dvh] bg-[#06080F] overflow-hidden text-zinc-300 font-sans relative">
+
+      {/* ── WORKSPACE ── */}
+      {/* ── WORKSPACE ── */}
+      
+      {/* ── DESKTOP WORKSPACE ── */}
+      <div className="hidden lg:flex flex-1 overflow-hidden">
+        <PanelGroup direction="horizontal" className="flex-1">
+          <Panel defaultSize={30} minSize={20}>{renderInstructionsPanel()}</Panel>
+          <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
+          <Panel defaultSize={38} minSize={20}>{renderEditorPanel()}</Panel>
+          <PanelResizeHandle className="w-[6px] bg-[#1E293B] hover:bg-orange-500 active:bg-orange-500 transition-colors cursor-col-resize" />
+          <Panel defaultSize={32} minSize={20}>{renderPreviewPanel()}</Panel>
+        </PanelGroup>
+      </div>
+
+      {/* ── MOBILE WORKSPACE ── */}
+      <div className="flex lg:hidden flex-col flex-1 overflow-hidden relative">
+        {/* Sticky Tabs */}
+        <div className="flex bg-[#0A0B1A] border-b border-[#1E293B] shrink-0 sticky top-0 z-10">
+          <button onClick={() => setMobileTab('question')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'question' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Lessons</button>
+          <button onClick={() => setMobileTab('code')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'code' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Code</button>
+          <button onClick={() => setMobileTab('output')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'output' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Preview</button>
+        </div>
+        
+        {/* Current Page Content */}
+        <div className="flex-1 overflow-hidden">
+          {mobileTab === 'question' && renderInstructionsPanel()}
+          {mobileTab === 'code' && renderEditorPanel()}
+          {mobileTab === 'output' && renderPreviewPanel()}
+        </div>
+      </div>
+
 
       {/* ── COMPLETION BANNER ── */}
       {showBanner && (
@@ -651,13 +680,13 @@ export default function CodeSandbox({
       )}
 
       {/* ── GLOBAL FOOTER ── */}
-      <footer className="h-16 bg-[#06080F] border-t border-[#1E293B] flex items-center justify-between px-6">
+      <footer className="h-auto min-h-[64px] py-2 lg:py-0 bg-[#06080F] border-t border-[#1E293B] flex flex-wrap lg:flex-nowrap items-center justify-between px-3 lg:px-6 gap-2">
         {/* left group */}
-        <div className="flex items-center gap-4">
-          <button className="bg-[#181D31] p-2 rounded-md border border-[#2A3441] hover:bg-[#2A3441] transition-colors">
+        <div className="flex items-center gap-2 lg:gap-4">
+          <button className="bg-[#181D31] p-1.5 lg:p-2 rounded-md border border-[#2A3441] hover:bg-[#2A3441] transition-colors shrink-0">
             <List size={20} className="text-zinc-300" />
           </button>
-          <div className="flex flex-col">
+          <div className="hidden md:flex flex-col">
              <h3 className="text-sm font-bold text-white leading-tight">{instruction.mainHeading || "Exercise"}</h3>
              <div className="flex items-center gap-2 mt-1">
                <span className="text-xs text-zinc-500">
@@ -685,39 +714,40 @@ export default function CodeSandbox({
           <button
             onClick={handleComplete}
             disabled={completed}
-            className={`flex items-center gap-2 px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+            className={`flex items-center gap-1.5 lg:gap-2 px-3 py-1.5 lg:px-6 lg:py-2 rounded-lg font-bold text-xs lg:text-sm transition-all whitespace-nowrap shrink-0 ${
               completed
                 ? 'bg-emerald-800/40 text-emerald-500 border border-emerald-800 cursor-not-allowed'
                 : 'bg-emerald-500 hover:bg-emerald-400 text-white border-b-4 border-emerald-700 active:border-b-0 active:translate-y-0.5'
             }`}
           >
             <CheckCircle2 size={16} />
-            {completed ? 'Completed ✓' : 'Complete'}
+            <span className="hidden sm:inline">{completed ? 'Completed ✓' : 'Complete'}</span>
+            <span className="sm:hidden">{completed ? '✓' : 'Complete'}</span>
           </button>
         )}
 
         {/* right group */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 lg:gap-3 shrink-0 ml-auto md:ml-0">
            {prevHref ? (
              <Link href={prevHref}>
-               <Button variant="outline" className="bg-transparent border-[#2A3441] text-white hover:bg-[#181D31] hover:text-white font-game text-xl px-8 border-b-4 active:border-b-0 active:translate-y-0.5">
+               <Button variant="outline" className="bg-transparent border-[#2A3441] text-white hover:bg-[#181D31] hover:text-white font-game text-xs px-3 lg:text-xl lg:px-8 border-b-4 active:border-b-0 active:translate-y-0.5 h-8 lg:h-10">
                  Back
                </Button>
              </Link>
            ) : (
-             <Button disabled variant="outline" className="bg-transparent border-[#2A3441] text-zinc-500 font-game text-xl px-8 opacity-50">
+             <Button disabled variant="outline" className="bg-transparent border-[#2A3441] text-zinc-500 font-game text-xs px-3 lg:text-xl lg:px-8 opacity-50 h-8 lg:h-10">
                Back
              </Button>
            )}
 
            {nextHref ? (
              <Link href={nextHref}>
-               <Button variant="outline" className="bg-transparent border-[#2A3441] text-white hover:bg-[#181D31] hover:text-white font-game text-xl px-8 border-b-4 active:border-b-0 active:translate-y-0.5">
+               <Button variant="outline" className="bg-transparent border-[#2A3441] text-white hover:bg-[#181D31] hover:text-white font-game text-xs px-3 lg:text-xl lg:px-8 border-b-4 active:border-b-0 active:translate-y-0.5 h-8 lg:h-10">
                  Next
                </Button>
              </Link>
            ) : (
-             <Button disabled variant="outline" className="bg-transparent border-[#2A3441] text-zinc-500 font-game text-xl px-8 opacity-50">
+             <Button disabled variant="outline" className="bg-transparent border-[#2A3441] text-zinc-500 font-game text-xs px-3 lg:text-xl lg:px-8 opacity-50 h-8 lg:h-10">
                Next
              </Button>
            )}

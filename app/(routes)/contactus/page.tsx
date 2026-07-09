@@ -5,33 +5,58 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+type Message = {
+  role: 'bot' | 'user'
+  text: string
+}
+
 const textShadow = {
   textShadow: "1px 1px 0 #000, -1px -1px 0 #000,1px -1px 0 #000, -1px 1px 0 #000"
 }
 
-const channels = [
-  {
-    icon: "/bot.gif",
-    title: "AI Support Bot",
-    desc: "Get instant answers to common coding questions 24/7 from our smart assistant.",
-  },
-  {
-    icon: "/tresure.gif",
-    title: "Bug Bounty",
-    desc: "Found a bug or issue in a lesson? Report it and earn bonus XP.",
-  },
-]
+
 
 const team = [
   { name: "Chaitanya Bhagat", role: "Creator", avatar: "/trainer.gif" },
 ]
 
 export default function ContactUsPage() {
-  const [sent, setSent] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'bot', text: "Hi there! I'm your friendly coding assistant bot. How can I help you on your adventure today?" }
+  ])
+  const [inputValue, setInputValue] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSent(true)
+    if (!inputValue.trim() || isTyping) return
+
+    const userMsg = inputValue.trim()
+    const newMessages: Message[] = [...messages, { role: 'user', text: userMsg }]
+    
+    setMessages(newMessages)
+    setInputValue('')
+    setIsTyping(true)
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages })
+      })
+      
+      const data = await response.json()
+      
+      if (data.text) {
+        setMessages(prev => [...prev, { role: 'bot', text: data.text }])
+      } else {
+        setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I had trouble connecting to my brain. Please try again later!" }])
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I encountered an error. Please try again!" }])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   return (
@@ -50,97 +75,72 @@ export default function ContactUsPage() {
           className="absolute top-0 h-full w-full flex flex-col justify-center px-8 md:px-24 xl:px-40 bg-gradient-to-r from-black/80 to-transparent"
           style={textShadow}
         >
-          <h1 className="text-7xl font-game">Contact Us</h1>
+          <h1 className="text-7xl font-game">Support</h1>
           <p className="text-3xl font-game mt-2">We're here to help on your adventure.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 px-8 md:px-24 py-14">
+      <div className="flex flex-col items-center gap-8 px-8 md:px-24 py-14">
         {/* Contact Form */}
-        <div>
-          <h2 className="font-game text-4xl mb-6">Send us a Message</h2>
-          {sent ? (
-            <div className="flex flex-col items-center gap-4 bg-zinc-900 border-2 border-green-700 rounded-xl p-10 text-center font-game">
-              <Image src="/star2.gif" alt="Success" width={80} height={80} unoptimized />
-              <h3 className="text-3xl text-green-400">Message Sent!</h3>
-              <p className="text-zinc-400 text-xl">
-                We'll get back to you within 24 hours. Check your inbox!
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-game">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <label className="text-zinc-400 text-lg">Your Name</label>
-                  <Input required placeholder="e.g. Chaitanya" className="text-lg py-5" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-zinc-400 text-lg">Email Address</label>
-                  <Input required type="email" placeholder="you@email.com" className="text-lg py-5" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-zinc-400 text-lg">Subject</label>
-                <Input required placeholder="e.g. Issue with React chapter 3" className="text-lg py-5" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-zinc-400 text-lg">Message</label>
-                <textarea
-                  required
-                  rows={5}
-                  placeholder="Tell us what's on your mind..."
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-md text-lg p-3 text-white resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              <Button type="submit" variant="pixel" className="font-game text-xl py-5 mt-2 w-fit px-10">
-                Send Message
-              </Button>
-            </form>
-          )}
-        </div>
-
-        {/* Right Side */}
-        <div className="flex flex-col gap-8">
-          {/* Support Channels */}
-          <div>
-            <h2 className="font-game text-4xl mb-4">Other Ways to Reach Us</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {channels.map((ch) => (
-                <div
-                  key={ch.title}
-                  className="bg-zinc-900 border-2 border-zinc-700 rounded-xl p-4 flex flex-col gap-2 hover:border-zinc-500 transition-colors cursor-pointer font-game"
-                >
-                  <Image src={ch.icon} alt={ch.title} width={48} height={48} unoptimized />
-                  <h3 className="text-xl">{ch.title}</h3>
-                  <p className="text-zinc-400 text-base">{ch.desc}</p>
-                </div>
-              ))}
+        <div className="flex flex-col w-full max-w-4xl h-[600px] bg-zinc-900 border-2 border-zinc-700 rounded-xl font-game">
+          <div className="p-4 border-b-2 border-zinc-700 bg-zinc-800 rounded-t-xl flex items-center gap-3">
+            <Image src="/bot.gif" alt="Bot" width={40} height={40} unoptimized className="rounded-full bg-zinc-900" />
+            <div>
+              <h2 className="text-2xl">Support Bot</h2>
+              <p className="text-green-400 text-sm">Online</p>
             </div>
           </div>
-
-          {/* Creator */}
-          <div>
-            <h2 className="font-game text-4xl mb-4">Creator</h2>
-            <div className="flex flex-col gap-4">
-              {team.map((member) => (
-                <div
-                  key={member.name}
-                  className="flex items-center gap-4 bg-zinc-900 border-2 border-zinc-700 rounded-xl p-4 font-game"
-                >
-                  <Image
-                    src={member.avatar}
-                    alt={member.name}
-                    width={56}
-                    height={56}
-                    unoptimized
-                    className="rounded-full"
-                  />
-                  <div>
-                    <h3 className="text-2xl">{member.name}</h3>
-                    <p className="text-zinc-400 text-lg">{member.role}</p>
-                  </div>
+          
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] rounded-2xl p-4 text-lg ${
+                  msg.role === 'user' 
+                    ? 'bg-blue-600 rounded-br-none text-white' 
+                    : 'bg-zinc-700 rounded-bl-none text-white'
+                }`}>
+                  {msg.text}
                 </div>
-              ))}
+              </div>
+            ))}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-zinc-700 rounded-2xl rounded-bl-none p-4 text-zinc-400 flex gap-2 items-center">
+                  <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={handleSend} className="p-4 border-t-2 border-zinc-700 flex gap-2 bg-zinc-800 rounded-b-xl">
+            <Input 
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your message..." 
+              className="text-lg py-6 bg-zinc-900 border-zinc-700 text-white flex-1" 
+            />
+            <Button type="submit" variant="pixel" className="text-xl py-6 px-8">
+              Send
+            </Button>
+          </form>
+        </div>
+
+        {/* Creator */}
+        <div className="w-full max-w-4xl flex items-center justify-between bg-zinc-900 border-2 border-zinc-700 rounded-xl p-4 font-game">
+          <div className="flex items-center gap-4">
+            <Image
+              src={team[0].avatar}
+              alt={team[0].name}
+              width={56}
+              height={56}
+              unoptimized
+              className="rounded-full"
+            />
+            <div>
+              <h3 className="text-2xl">{team[0].name}</h3>
+              <p className="text-zinc-400 text-lg">{team[0].role}</p>
             </div>
           </div>
         </div>

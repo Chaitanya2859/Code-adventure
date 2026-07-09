@@ -86,7 +86,7 @@ export default function ContactUsPage() {
           <div className="p-4 border-b-2 border-zinc-700 bg-zinc-800 rounded-t-xl flex items-center gap-3">
             <Image src="/bot.gif" alt="Bot" width={40} height={40} unoptimized className="rounded-full bg-zinc-900" />
             <div>
-              <h2 className="text-2xl">Support Bot</h2>
+              <h2 className="text-2xl">Timothy</h2>
               <p className="text-green-400 text-sm">Online</p>
             </div>
           </div>

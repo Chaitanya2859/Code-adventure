@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import CourseDetail from "./_component/CourseDetail"
 import CourseChapters from "./_component/CourseChapters"
 import axios from "axios"
@@ -42,6 +42,7 @@ type Props= {
 const course = () => {
 
     const {courseId}= useParams()
+    const router = useRouter()
     const [loading, setLoading]= useState(false)
     const [courseDetail, setCourseDetail]= useState<Course>()
 
@@ -50,10 +51,15 @@ const course = () => {
     },[courseId])
 
     const getCourseDetail = async ()=>{
-        setLoading(true)
-        const res = await axios.get('/api/course?courseid=' + courseId)
-        setCourseDetail(res?.data)
-        setLoading(false)
+        try {
+            setLoading(true)
+            const res = await axios.get('/api/course?courseid=' + courseId)
+            setCourseDetail(res?.data)
+        } catch (error) {
+            router.push('/courses')
+        } finally {
+            setLoading(false)
+        }
     }
   return (
     <div className="">

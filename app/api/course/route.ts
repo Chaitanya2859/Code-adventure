@@ -28,6 +28,10 @@ export async function GET(req: NextRequest) {
             ),
         ]);
 
+        if (res.rows.length === 0) {
+            return NextResponse.json({ error: "Course not found" }, { status: 404 });
+        }
+
         const isEnrolled = enrollCourse.rows.length > 0;
 
         return NextResponse.json({
@@ -41,8 +45,6 @@ export async function GET(req: NextRequest) {
         });
     } else {
         const res = await pool.query(`SELECT * FROM courses`);
-        return NextResponse.json(res.rows, {
-            headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' }
-        });
+        return NextResponse.json(res.rows);
     }
 }

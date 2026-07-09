@@ -3,9 +3,7 @@ import pool from "@/config/db"
 import htmlExercises from "@/html-exercises"
 import cssExercises from "@/css-exercises"
 import jsExercises from "@/js-exercises"
-import reactExercises from "@/react-exercises"
 import pythonExercises from "@/pythonExercises"
-import nodeExercises from "@/nodeExercises"
 
 // ────────────────────────────────────────────────────
 // Static exercise data (keyed by slug)
@@ -15,9 +13,7 @@ const exerciseData: Record<string, any> = {
   ...htmlExercises,
   ...cssExercises,
   ...jsExercises,
-  ...reactExercises,
   ...pythonExercises,
-  ...nodeExercises,
   'hello-world': {
     numberTitle: '01. The Silent Void',
     mainHeading: 'Lighting the Spark',
@@ -166,16 +162,14 @@ export default async function PracticePage({
   const isHtmlCourse = courseId === '1'
   const isCssCourse = courseId === '2'
   const isJsCourse = courseId === '6'
-  const isReactCourse = courseId === '3'
   const isPythonCourse = courseId === '5'
-  const isNodeCourse = courseId === '7'
   const tabs = isHtmlCourse 
     ? ['html' as const] 
     : isCssCourse 
       ? ['html' as const, 'css' as const] 
       : isJsCourse
         ? ['html' as const, 'js' as const]
-        : (isReactCourse || isPythonCourse || isNodeCourse)
+        : isPythonCourse
           ? ['js' as const]
           : undefined
 

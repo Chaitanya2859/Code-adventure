@@ -36,6 +36,7 @@ type Props={
     courseDetail: Course | undefined
 }
 
+
 const CourseStatus = ({courseDetail}: Props) => {
 
     const [count, setCount]= useState<{

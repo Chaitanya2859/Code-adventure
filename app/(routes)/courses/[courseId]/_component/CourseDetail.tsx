@@ -11,7 +11,6 @@ import { toast } from "sonner"
 
 import Link from "next/link"
 
-
 type Course={
     id: number,
     courseId: number,

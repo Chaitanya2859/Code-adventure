@@ -29,9 +29,9 @@ const UserCurrentStatus = () => {
 
   return (
     <div className="bg-zinc-900 p-4 border-2 rounded-xl">
-        <div className="flex gap-4 md:gap-6 justify-center items-center">
-        <Image src={'/trainer.gif'} alt='Your profile' width={60} height={60} unoptimized className="w-10 h-10 md:w-[60px] md:h-[60px]" />
-        <h2 className="font-game">{(user?.email?.length ?? 0) > 20 ? <div className="text-lg md:text-xl">{user?.email} </div>: <div className="text-xl md:text-2xl">{user?.email} </div>} </h2>
+        <div className="flex justify-center gap-4 md:gap-6 items-center py-4 px-2">
+        <Image src={'/trainer.gif'} alt='Your profile' width={80} height={80} unoptimized className="w-16 h-16 md:w-[80px] md:h-[80px] shrink-0 object-contain" />
+        <h2 className="font-game">{(user?.name?.length ?? 0) > 20 ? <div className="text-lg md:text-xl text-right">{user?.name} </div>: <div className="text-xl md:text-2xl text-right">{user?.name} </div>} </h2>
         </div>
         
         <div className="grid gap-4 grid-cols-2 mt-4">

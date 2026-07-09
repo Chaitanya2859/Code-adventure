@@ -18,7 +18,7 @@ const ExploreMoreOptions = [
   },
   {
     id: 3,
-    title: "Community Project",
+    title: "Projects",
     desc: "Build real-world apps by collaborating with the community.",
     icon: "/rainbow.png",
     path: "/coming-soon"

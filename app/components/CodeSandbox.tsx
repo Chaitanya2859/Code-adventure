@@ -161,12 +161,18 @@ function buildSrcdoc(files: FileState): string {
 </script>
 `;
 
-  // Inject CSS and JS into the HTML string
+  // Inject CSS into the HTML string
   const withInterceptor = consoleInterceptorScript + files.html;
-  const withStyles = withInterceptor.replace(
-    '<style>/* CSS will be injected here */</style>',
-    `<style>${files.css}</style>`
-  );
+  let withStyles = withInterceptor;
+  const linkRegex = /<link[^>]*rel=["']?stylesheet["']?[^>]*href=["']?style\.css["']?[^>]*>/i;
+  
+  if (withStyles.match(linkRegex)) {
+    withStyles = withStyles.replace(linkRegex, `<style>${files.css}</style>`);
+  } else if (withStyles.includes('</head>')) {
+    withStyles = withStyles.replace('</head>', `<style>${files.css}</style>\n</head>`);
+  } else {
+    withStyles = `<style>${files.css}</style>\n` + withStyles;
+  }
 
   let withScript = '';
   const scriptRegex = /<script[^>]*src=["']?script\.js["']?[^>]*><\/script>/i;
@@ -365,11 +371,11 @@ export default function CodeSandbox({
                <h1 className="text-white text-3xl font-bold mb-4">{instruction.mainHeading}</h1>
                
                {instruction.introduction && (
-                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]">{instruction.introduction}</p>
+                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: instruction.introduction }}></p>
                )}
 
                {instruction.conceptExplanation && (
-                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]">{instruction.conceptExplanation}</p>
+                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: instruction.conceptExplanation }}></p>
                )}
 
                {instruction.relatedConcepts && instruction.relatedConcepts.length > 0 && (
@@ -378,7 +384,7 @@ export default function CodeSandbox({
                    <ul className="list-disc pl-5 space-y-2 text-sm mb-4">
                      {instruction.relatedConcepts.map((concept, idx) => (
                         <li key={idx}>
-                          <span className="font-bold text-white">{concept.title}:</span> <span className="text-[#A8B2D1]">{concept.desc}</span>
+                          <span className="font-bold text-white">{concept.title}:</span> <span className="text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: concept.desc }}></span>
                         </li>
                      ))}
                    </ul>
@@ -388,7 +394,7 @@ export default function CodeSandbox({
                {instruction.funFact && (
                  <div className="bg-[#1A1F35] border border-[#2A3441] rounded-lg p-4 mt-6">
                    <p className="font-bold text-yellow-400 text-xs uppercase tracking-wider mb-1">🧐 Fun Fact</p>
-                   <p className="text-sm text-[#A8B2D1] leading-relaxed">{instruction.funFact}</p>
+                   <p className="text-sm text-[#A8B2D1] leading-relaxed" dangerouslySetInnerHTML={{ __html: instruction.funFact }}></p>
                  </div>
                )}
             </div>
@@ -683,28 +689,11 @@ export default function CodeSandbox({
       <footer className="h-auto min-h-[64px] py-2 lg:py-0 bg-[#06080F] border-t border-[#1E293B] flex flex-wrap lg:flex-nowrap items-center justify-between px-3 lg:px-6 gap-2">
         {/* left group */}
         <div className="flex items-center gap-2 lg:gap-4">
-          <button className="bg-[#181D31] p-1.5 lg:p-2 rounded-md border border-[#2A3441] hover:bg-[#2A3441] transition-colors shrink-0">
-            <List size={20} className="text-zinc-300" />
-          </button>
           <div className="hidden md:flex flex-col">
-             <h3 className="text-sm font-bold text-white leading-tight">{instruction.mainHeading || "Exercise"}</h3>
              <div className="flex items-center gap-2 mt-1">
                <span className="text-xs text-zinc-500">
                  Exercise {exerciseNumber} / {totalExercises}
                </span>
-               <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-400 px-2 py-0.5 rounded-full">
-                 {totalXp} XP
-               </span>
-               <span className="text-[10px] font-bold bg-blue-950 text-[#38bdf8] px-2 py-0.5 rounded-full border border-blue-900/50">
-                 Lvl {Math.floor(totalXp / 100) + 1}
-               </span>
-               {/* Sleek mini level progress bar */}
-               <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700/60 ml-1" title={`${totalXp % 100} / 100 XP to next level`}>
-                 <div 
-                   className="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-500"
-                   style={{ width: `${totalXp % 100}%` }}
-                 />
-               </div>
              </div>
           </div>
         </div>

@@ -52,8 +52,6 @@ type Props= {
     loading: boolean
 }
 
-
-
 const CourseChapters = ({loading , courseDetail}: Props) => {
 
 

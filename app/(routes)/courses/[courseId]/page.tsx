@@ -40,7 +40,6 @@ type Props= {
 }
 
 const course = () => {
-
     const {courseId}= useParams()
     const router = useRouter()
     const [loading, setLoading]= useState(false)

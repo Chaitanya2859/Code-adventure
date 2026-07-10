@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
             headers: { 'Cache-Control': 's-maxage=0' }
         });
     } else {
-        const res = await pool.query(`SELECT * FROM courses`);
+        const res = await pool.query(`SELECT * FROM courses ORDER BY "courseId" ASC`);
         return NextResponse.json(res.rows);
     }
 }

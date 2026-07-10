@@ -1,8 +1,19 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import { useContext } from "react"
+import { UserDetailsContext } from "@/context/UserDetailsContext"
 
 const Upgrade = () => {
+  const { userDetail } = useContext(UserDetailsContext)
+
+  // Hide if user is already on a premium plan
+  if (userDetail?.plan === 'Adventurer' || userDetail?.plan === 'Legend') {
+    return null
+  }
+
   return (
     <div className="flex justify-center rounded-lg items-center flex-col gap-4 border-4 bg-zinc-900 p-5 mt-8">
         <Image src='/crown.png' alt='logo' height={70} width={70} />

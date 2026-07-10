@@ -276,8 +276,8 @@ export default function CodeSandbox({
     setCompiledCode(buildSrcdoc(files))
     setHasRun(true)
     setIframeKey(k => k + 1)   // remount = clean slate
-    // Switch to console upon running only if we are in the JavaScript course (courseId = '6')
-    if (courseId === '6') {
+    // Switch to console upon running only if we are in the JavaScript course (courseId = '3')
+    if (courseId === '3') {
       setRightTab('console')
     }
   }

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const courseId = req.nextUrl.searchParams.get("courseid");
 
     if (courseId) {
-        const [res, chapterResult, enrollCourse, completedEx] = await Promise.all([
+        const [res, chapterResult, enrollCourse, completedEx, userResult] = await Promise.all([
             pool.query(
                 `SELECT * FROM courses WHERE "courseId" = $1`,
                 [Number(courseId)]
@@ -26,6 +26,10 @@ export async function GET(req: NextRequest) {
                 `SELECT * FROM "completedExercise" WHERE "courseId" = $1 AND "userId" = $2`,
                 [Number(courseId), email]
             ),
+            pool.query(
+                `SELECT plan FROM users WHERE email = $1`,
+                [email]
+            )
         ]);
 
         if (res.rows.length === 0) {
@@ -33,6 +37,7 @@ export async function GET(req: NextRequest) {
         }
 
         const isEnrolled = enrollCourse.rows.length > 0;
+        const userPlan = userResult?.rows?.[0]?.plan || 'Explorer';
 
         return NextResponse.json({
             ...res.rows[0],
@@ -40,6 +45,7 @@ export async function GET(req: NextRequest) {
             userEnroll: isEnrolled,
             completedExercises: completedEx.rows.map((c: any) => c.exerciseId),
             earnedXp: isEnrolled ? enrollCourse.rows[0].xpEarned : 0,
+            userPlan,
         }, {
             headers: { 'Cache-Control': 's-maxage=0' }
         });

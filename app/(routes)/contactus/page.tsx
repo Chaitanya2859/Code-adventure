@@ -22,7 +22,7 @@ const team = [
 
 export default function ContactUsPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', text: "Hi there! I'm your friendly coding assistant bot. How can I help you on your adventure today?" }
+    { role: 'bot', text: "Hi there! I'm your friendly coding assistant Timothy. How can I help you on your adventure today?" }
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -75,7 +75,7 @@ export default function ContactUsPage() {
           className="absolute top-0 h-full w-full flex flex-col justify-center px-8 md:px-24 xl:px-40 bg-gradient-to-r from-black/80 to-transparent"
           style={textShadow}
         >
-          <h1 className="text-7xl font-game">Support</h1>
+          <h1 className="text-7xl font-game">Assistance</h1>
           <p className="text-3xl font-game mt-2">We're here to help on your adventure.</p>
         </div>
       </div>

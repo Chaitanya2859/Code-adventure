@@ -4,10 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
 import course from "../page"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import axios from "axios"
 import { toast } from "sonner"
-
+import { UserDetailsContext } from "@/context/UserDetailsContext"
 
 import Link from "next/link"
 
@@ -47,6 +47,8 @@ type Props= {
 
 const CourseDetail = ({loading , courseDetail, refreshData}: Props) => {
 
+    const { userDetail } = useContext(UserDetailsContext)
+    const isPremium = userDetail?.plan === 'Adventurer' || userDetail?.plan === 'Legend'
     const [load, setLoad]= useState(false)
     const enrollCourse = async ()=>{
         setLoad(true)
@@ -77,7 +79,7 @@ const CourseDetail = ({loading , courseDetail, refreshData}: Props) => {
                 }
             } >{courseDetail?.desc}</p>
                 {courseDetail.userEnroll ? <></> : 
-                    courseDetail.free ? 
+                    (courseDetail.free || isPremium) ? 
                     <Button className="text-2xl font-game" size={'lg'} variant={'pixel'} disabled={load} onClick={enrollCourse}>Enroll now</Button> :
                     <Link href="/pricing"><Button className="text-2xl font-game" size={'lg'} variant={'pixel'}>Upgrade now</Button></Link>
                 }

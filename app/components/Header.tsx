@@ -18,8 +18,7 @@ import { LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
 const courses = [
   { id: 1, name: "HTML", desc: "Learn the fundamentals of HTML and build the structure of modern web pages.", path: "/courses/1" },
   { id: 2, name: "CSS", desc: "Master CSS to style and design responsive, visually appealing web layouts.", path: "/courses/2" },
-  { id: 3, name: "JavaScript", desc: "Explore JavaScript topics such as closures, prototypes, async programming, and modern ES6+ features.", path: "/courses/6" },
-  { id: 5, name: "Python", desc: "Understand the core concepts of Python and start building interactive features on the web.", path: "/courses/5" },
+  { id: 3, name: "JavaScript", desc: "Explore JavaScript topics such as closures, prototypes, async programming, and modern ES6+ features.", path: "/courses/3" },
 ];
 
 const Header = () => {
@@ -98,7 +97,7 @@ const Header = () => {
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
               <Link href="/contactus" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
-                Support
+                Assistance
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
@@ -176,7 +175,7 @@ const Header = () => {
               )}
               <Link href="/courses" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Courses</Link>
               <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Pricing</Link>
-              <Link href="/contactus" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Contact us</Link>
+              <Link href="/contactus" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Assistance</Link>
             </div>
 
             <div className="mt-auto border-t border-zinc-800 pt-6">

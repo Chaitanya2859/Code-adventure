@@ -34,19 +34,22 @@ const ExploreMoreOptions = [
 
 const ExploreMore = () => {
   return (
-    <div className="mt-4 grid grid-cols-2 gap-3">
-        {ExploreMoreOptions.map((key, index)=>(
-                <Link href={key.path} key={index}>
-                <div className="p-4 bg-zinc-900 rounded-xl border-2 hover:bg-zinc-800 cursor-pointer h-full">
-                    
-                    <div className="flex gap-8 items-center">
-                    <Image src={key.icon} alt={key.title} width={80} height={80} />
-                    <h2 className="font-game text-3xl">{key.title}</h2>
+    <div className="mt-4">
+        <p className="text-zinc-500 text-lg font-game mb-3">Coming soon...</p>
+        <div className="grid grid-cols-2 gap-3">
+            {ExploreMoreOptions.map((key, index)=>(
+                    <Link href={key.path} key={index}>
+                    <div className="p-4 bg-zinc-900 rounded-xl border-2 hover:bg-zinc-800 cursor-pointer h-full">
+                        
+                        <div className="flex gap-8 items-center">
+                        <Image src={key.icon} alt={key.title} width={80} height={80} />
+                        <h2 className="font-game text-3xl">{key.title}</h2>
+                        </div>
+                        <h2 className="font-game font-medium  pt-2 text-zinc-400">{key.desc}</h2>
                     </div>
-                    <h2 className="font-game font-medium  pt-2 text-zinc-400">{key.desc}</h2>
-                </div>
-                </Link>
-            ))}
+                    </Link>
+                ))}
+        </div>
     </div>
   )
 }

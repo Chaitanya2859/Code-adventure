@@ -7,7 +7,7 @@ import axios from "axios"
 
 const UserCurrentStatus = () => {
     const { user } = useAuth()
-    const [stats, setStats] = useState({ xp: 0, badges: 0, streak: 0, level: 1, levelProgress: 0 })
+    const [stats, setStats] = useState({ xp: 0, level: 1, levelProgress: 0 })
     const [loading, setLoading] = useState(true)
 
     const fetchStats = async () => {
@@ -44,16 +44,6 @@ const UserCurrentStatus = () => {
                     <h1 className="text-gray-500 text-lg mt-2 font-game">Total XP</h1>
                 </div>
             </div>
-            
-            <div className="">
-                <div className="flex items-center gap-2 md:gap-4">
-                    <Image src={'/tresure.gif'} alt='Badge' width={40} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" height={40} unoptimized />
-                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.badges}</h2>
-                </div>
-                <div className="flex items-center gap-3">
-                    <h1 className="text-gray-500 text-lg mt-2 font-game">Badges</h1>
-                </div>
-            </div>
 
             <div className="">
                 <div className="flex items-center gap-2 md:gap-4">
@@ -62,16 +52,6 @@ const UserCurrentStatus = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <h1 className="text-gray-500 text-lg mt-2 font-game">User Level</h1>
-                </div>
-            </div>
-
-            <div className="">
-                <div className="flex items-center gap-2 md:gap-4">
-                    <Image src={'/fire.gif'} alt='Streak' width={40} className="mb-2 w-8 h-8 md:w-[40px] md:h-[40px]" height={40} unoptimized />
-                    <h2 className="text-2xl md:text-3xl font-game">{loading ? "..." : stats.streak}</h2>
-                </div>
-                <div className="flex items-center gap-3">
-                    <h1 className="text-gray-500 text-lg mt-2 font-game">Streak</h1>
                 </div>
             </div>
         </div>

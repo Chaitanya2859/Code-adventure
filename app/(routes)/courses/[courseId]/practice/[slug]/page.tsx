@@ -3,7 +3,6 @@ import pool from "@/config/db"
 import htmlExercises from "@/html-exercises"
 import cssExercises from "@/css-exercises"
 import jsExercises from "@/js-exercises"
-import pythonExercises from "@/pythonExercises"
 
 // ────────────────────────────────────────────────────
 // Static exercise data (keyed by slug)
@@ -13,7 +12,6 @@ const exerciseData: Record<string, any> = {
   ...htmlExercises,
   ...cssExercises,
   ...jsExercises,
-  ...pythonExercises,
   'hello-world': {
     numberTitle: '01. The Silent Void',
     mainHeading: 'Lighting the Spark',
@@ -129,6 +127,7 @@ function getInstruction(slug: string) {
 // Page
 // ────────────────────────────────────────────────────
 import { getSession } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function PracticePage({
   params,
@@ -141,6 +140,7 @@ export default async function PracticePage({
   const authUser = await getSession();
   let isAlreadyCompleted = false;
   let userGlobalXp = 0;
+  let userPlan = 'Explorer';
   
   if (authUser?.email) {
     const email = authUser.email;
@@ -156,22 +156,37 @@ export default async function PracticePage({
       [email]
     );
     userGlobalXp = enrollments.rows.reduce((sum: number, item: any) => sum + (item.xpEarned || 0), 0);
+
+    const userResult = await pool.query(
+      `SELECT plan FROM users WHERE email = $1`,
+      [email]
+    );
+    userPlan = userResult.rows[0]?.plan || 'Explorer';
+
+    const isEnrolledInCourse = enrollments.rows.some((e: any) => e.courseId === Number(courseId));
+    if (!isEnrolledInCourse) {
+      redirect(`/courses/${courseId}`);
+    }
+  } else {
+    // Not logged in — redirect to course page
+    redirect(`/courses/${courseId}`);
+  }
+
+  if (courseId === '3' && userPlan !== 'Adventurer' && userPlan !== 'Legend') {
+    redirect('/pricing');
   }
   
   // Only show relevant tabs based on course
   const isHtmlCourse = courseId === '1'
   const isCssCourse = courseId === '2'
-  const isJsCourse = courseId === '6'
-  const isPythonCourse = courseId === '5'
+  const isJsCourse = courseId === '3'
   const tabs = isHtmlCourse 
     ? ['html' as const] 
     : isCssCourse 
       ? ['html' as const, 'css' as const] 
       : isJsCourse
         ? ['html' as const, 'js' as const]
-        : isPythonCourse
-          ? ['js' as const]
-          : undefined
+        : undefined
 
   // Calculate Navigation
   const slugs = Object.keys(exerciseData).filter(k => k !== '_default')

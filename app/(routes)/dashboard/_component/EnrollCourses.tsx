@@ -30,6 +30,10 @@ const EnrollCourses = () => {
             }
         }
         getEnrolled();
+
+        const handleFocus = () => getEnrolled();
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
   return (

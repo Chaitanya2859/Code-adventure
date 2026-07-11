@@ -102,7 +102,7 @@ export default function PricingPage() {
 
       // Initialize Razorpay
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY || "rzp_test_TBcxmvPm2725lx", // Fallback to your test key
+        key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
         amount: data.order.amount,
         currency: data.order.currency,
         name: "Code Adventure",

@@ -41,10 +41,10 @@ import DinoLoader from "@/app/components/DinoLoader"
           <DinoLoader size={200} text="Loading Courses..." />
         </div>
       ) : (
-        <div className="grid grid-cols-1 cursor-pointer mx-8 px-8 py-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 cursor-pointer mx-4 px-2 py-4 md:mx-8 md:px-8 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
           {courseList?.map((key)=>(
             <Link href={'/courses/' + key.courseId}  key={key.courseId} >
-            <div className=" mx-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 p-4 border border-zinc-700 h-full">
+            <div className="mx-0 md:mx-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 p-4 border border-zinc-700 h-full">
                 <Image src={(key?.banner).trimEnd()} alt={key?.title} unoptimized width={400} className="h-35 w-full rounded-t-md" height={400} />
                 <div className="font-game">
                     <h2  className="text-4xl">{key.title}</h2>

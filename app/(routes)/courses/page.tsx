@@ -5,9 +5,7 @@ const Courses = () => {
   return (
     <div className=''>
         <div className="relative ">
-            <video autoPlay muted loop playsInline className='w-full object-cover h-85'>
-              <source src="/hero12.mp4" type="video/mp4" />
-            </video>
+            <Image src={'/hero7.gif'} alt="Courses Banner" width={1920} height={400} unoptimized className='w-full object-cover h-[400px]' />
             <div style={
                 {
                     textShadow: "1px 1px 0 #000, -1px -1px 0 #000,1px -1px 0 #000, -1px 1px 0 #000"

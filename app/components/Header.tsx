@@ -19,6 +19,7 @@ const courses = [
   { id: 1, name: "HTML", desc: "Learn the fundamentals of HTML and build the structure of modern web pages.", path: "/courses/1" },
   { id: 2, name: "CSS", desc: "Master CSS to style and design responsive, visually appealing web layouts.", path: "/courses/2" },
   { id: 3, name: "JavaScript", desc: "Learn the basics of JavaScript and start adding interactivity to your web pages.", path: "/courses/3" },
+  { id: 4, name: "All courses", desc: "Explore all our available coding courses.", path: "/courses" },
 ];
 
 const Header = () => {

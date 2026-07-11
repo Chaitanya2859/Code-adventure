@@ -168,7 +168,7 @@ export default function PricingPage() {
       {/* Banner */}
       <div className="relative">
         <Image
-          src="/hero7.gif"
+          src="/hero99.gif"
           alt="Pricing Banner"
           width={1920}
           height={400}

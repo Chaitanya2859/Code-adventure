@@ -59,46 +59,48 @@ const Header = () => {
         <NavigationMenu>
           <NavigationMenuList className="flex gap-8 font-game text-2xl justify-center">
             {user && (
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link href="/dashboard" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors text-yellow-400">
-                    Dashboard
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            )}
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="font-game text-2xl">Courses</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
-                  {courses.map((course, index) => (
-                    <NavigationMenuLink asChild key={index}>
-                      <Link href={course.path}>
-                        <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
-                          <h2 className="font-bold">{course.name}</h2>
-                          <p className="text-xs text-zinc-500">{course.desc}</p>
-                        </div>
-                      </Link>
-                    </NavigationMenuLink>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
+              <>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link href="/dashboard" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors text-yellow-400">
+                      Dashboard
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="font-game text-2xl">Courses</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
+                      {courses.map((course, index) => (
+                        <NavigationMenuLink asChild key={index}>
+                          <Link href={course.path}>
+                            <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
+                              <h2 className="font-bold">{course.name}</h2>
+                              <p className="text-xs text-zinc-500">{course.desc}</p>
+                            </div>
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link href="/pricing" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
-                  Pricing
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link href="/contactus" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
-                  Assistance
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link href="/pricing" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+                      Pricing
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link href="/contactus" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+                      Assistance
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </>
+            )}
           </NavigationMenuList>
         </NavigationMenu>
       </div>
@@ -166,11 +168,13 @@ const Header = () => {
             </div>
             <div className="flex flex-col gap-4 font-game text-2xl">
               {user && (
-                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-yellow-400 hover:text-yellow-300">Dashboard</Link>
+                <>
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-yellow-400 hover:text-yellow-300">Dashboard</Link>
+                  <Link href="/courses" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Courses</Link>
+                  <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Pricing</Link>
+                  <Link href="/contactus" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Assistance</Link>
+                </>
               )}
-              <Link href="/courses" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Courses</Link>
-              <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Pricing</Link>
-              <Link href="/contactus" onClick={() => setMobileMenuOpen(false)} className="hover:text-yellow-400">Assistance</Link>
             </div>
 
             <div className="mt-auto border-t border-zinc-800 pt-6">

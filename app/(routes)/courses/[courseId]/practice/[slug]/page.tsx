@@ -4,10 +4,6 @@ import htmlExercises from "@/html-exercises"
 import cssExercises from "@/css-exercises"
 import jsExercises from "@/js-exercises"
 
-// ────────────────────────────────────────────────────
-// Static exercise data (keyed by slug)
-// In production, pull this from DB or a content layer
-// ────────────────────────────────────────────────────
 const exerciseData: Record<string, any> = {
   ...htmlExercises,
   ...cssExercises,

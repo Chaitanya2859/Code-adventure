@@ -20,13 +20,12 @@ const plans = [
     priceText: "Free",
     price: 0,
     period: "",
-    badge: "/hero11.gif",
+    badge: "/smile.png",
     badgeAlt: "Free",
     highlight: false,
     features: [
       "Access to 2 free courses (HTML & CSS)",
       "progress tracking",
-      "100 XP cap per month",
     ],
     cta: "Get Started",
     href: "/courses",
@@ -70,7 +69,7 @@ const plans = [
 
 export default function PricingPage() {
   const router = useRouter()
-  const { setUserDetail } = useContext(UserDetailsContext)
+  const { userDetail, setUserDetail } = useContext(UserDetailsContext)
   const [loadingPlan, setLoadingPlan] = useState<number | null>(null)
 
   const handlePayment = async (plan: typeof plans[0]) => {
@@ -94,7 +93,7 @@ export default function PricingPage() {
       if (!res.ok) {
         if (res.status === 401) {
           toast.error("Please sign in to continue")
-          router.push('/sign-in') // Adjust to actual sign-in route
+          router.push('/sign-in')
         } else {
           toast.error(data.error || "Failed to initiate payment")
         }
@@ -131,7 +130,7 @@ export default function PricingPage() {
                   const updatedUser = await userRes.json()
                   setUserDetail(updatedUser)
                 }
-              } catch (_) {}
+              } catch (_) { }
               router.push('/dashboard')
             } else {
               toast.error(verifyData.error || "Payment verification failed")
@@ -227,14 +226,26 @@ export default function PricingPage() {
               </ul>
 
               <div className="mt-auto pt-4">
-                <Button
-                  variant={plan.highlight || plan.id === 3 ? "pixel" : "default"}
-                  className={`w-full font-game text-xl py-5 ${plan.buttonClass}`}
-                  onClick={() => handlePayment(plan)}
-                  disabled={loadingPlan === plan.id}
-                >
-                  {loadingPlan === plan.id ? "Loading..." : plan.cta}
-                </Button>
+                {(() => {
+                  const userPlanLevel = userDetail?.plan === "Legend" ? 3 : userDetail?.plan === "Adventurer" ? 2 : 1;
+                  const currentPlanLevel = plan.name === "Legend" ? 3 : plan.name === "Adventurer" ? 2 : 1;
+                  const isOwned = currentPlanLevel <= userPlanLevel;
+
+                  return (
+                    <Button
+                      variant={plan.highlight || plan.id === 3 ? "pixel" : "default"}
+                      className={`w-full font-game text-xl py-5 ${plan.buttonClass}`}
+                      onClick={() => handlePayment(plan)}
+                      disabled={loadingPlan === plan.id || isOwned}
+                    >
+                      {loadingPlan === plan.id
+                        ? "Loading..."
+                        : isOwned
+                          ? (currentPlanLevel === userPlanLevel ? "Current Plan" : "Included")
+                          : plan.cta}
+                    </Button>
+                  );
+                })()}
               </div>
             </div>
           ))}

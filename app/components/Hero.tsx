@@ -1,14 +1,11 @@
-import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import Link from "next/link"
+import HeroCTA from "./HeroCTA"
 
 const Hero = () => {
   return (
     <div className="relative w-full min-h-[calc(100vh-11vh)] overflow-hidden">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover absolute inset-0">
-          <source src="/hero3.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute w-full mt-24 md:mt-32 flex flex-col justify-center items-center text-center px-4">
+        <img src="/hero3.gif" alt="Hero background" className="w-full h-full object-cover absolute inset-0 -z-10" />
+        <div className="absolute w-full mt-24 md:mt-32 flex flex-col justify-center items-center text-center px-4 z-10">
             <h2 className="font-bold text-5xl md:text-7xl font-game" 
                         style={
                 {
@@ -22,9 +19,7 @@ const Hero = () => {
                 }
             }>Coding Adventure</h2>
             <h2 className="mt-4 md:mt-7 font-game text-xl md:text-3xl max-w-2xl">Beginner friendly coding courses and projects</h2>
-            <Link href="/courses">
-              <Button variant="pixel" className="font-game text-3xl mt-4 px-8 py-6 cursor-pointer">Get Started</Button>
-            </Link>
+            <HeroCTA />
         </div>
     </div>
   )

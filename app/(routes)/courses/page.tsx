@@ -14,7 +14,7 @@ const Courses = () => {
                 }
             } className="absolute top-0 h-full pt-24 px-8 md:px-24 lg:32 xl:px-40 bg-linear-to-r from-black/80 to-white-50/50  ">
                 <h2 className='text-7xl font-game'>Explore all courses</h2>
-                <h2 className='text-3xl font-game'>Explore all courses and enroll to learn and inprove your skills</h2>
+                <h2 className='text-3xl font-game'>Improve your skills</h2>
             </div>
         </div>
 

@@ -64,9 +64,11 @@ const CourseChapters = ({loading , courseDetail}: Props) => {
 <Accordion type="single" collapsible>
   <AccordionItem value="item-1">
     <AccordionTrigger className="p-6 hover:underline-0 hover:bg-zinc-800 text-3xl">
-        <h2>{chapter.chapterId}</h2>
-        {chapter.title}
-        </AccordionTrigger>
+        <div className="flex gap-4 items-center text-left">
+            <h2>{chapter.chapterId}</h2>
+            <h2>{chapter.title}</h2>
+        </div>
+    </AccordionTrigger>
             <AccordionContent className="p-6 text-xl text-gray-300">
                 <div className="bg-zinc-900 p-2 rounded-2xl">
                     {chapter.exercises.map((exercise, idx)=>{
@@ -82,8 +84,8 @@ const CourseChapters = ({loading , courseDetail}: Props) => {
                             : `/courses/${courseDetail?.courseId}/practice/${exercise.slug}`;
 
                         return <div className="flex p-4 text-lg md:text-2xl justify-between items-center hover:bg-zinc-800 rounded-2xl" key={idx}>
-                            <div className="flex gap-2 md:gap-4 items-center">
-                            <h2> Exercise {idx+1}: </h2>
+                            <div className="flex gap-2 md:gap-4 items-center overflow-hidden">
+                            <h2 className="whitespace-nowrap shrink-0"> Exercise {idx+1}: </h2>
                             <h1 className="line-clamp-1"> {exercise.name}</h1>
                             </div>
                                 <Link href={buttonHref} className="shrink-0 ml-4">

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     const user = result.rows[0];
 
-    // Check if account has a password (old Clerk accounts won't)
+    // Check if account has a password
     if (!user.password) {
       return NextResponse.json({
         error: 'This account was created with a social login. Please set a password first.'

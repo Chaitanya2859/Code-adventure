@@ -43,7 +43,7 @@ const plans = [
     highlight: true,
     features: [
       "Access to ALL 3 courses",
-      "Unlimited XP & streaks",
+      "Unlimited XP",
       "Completion certificates",
     ],
     cta: "Join Now",

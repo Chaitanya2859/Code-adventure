@@ -21,13 +21,11 @@ export default function Provider({
 
   const hasCreatedUser = React.useRef(false);
 
-  // Fetch the current auth session on mount
   useEffect(() => {
     axios.get('/api/auth/me')
       .then(res => {
         if (res.data.user) {
           setAuthUser(res.data.user);
-          // Also sync user profile to our users table
           if (!hasCreatedUser.current) {
             hasCreatedUser.current = true;
             axios.post('/api/user/', {})

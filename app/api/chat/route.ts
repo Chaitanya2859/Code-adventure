@@ -15,13 +15,11 @@ export async function POST(req: Request) {
       systemInstruction: "You are a friendly and helpful coding assistant bot for Code Adventure, created by Chaitanya Bhagat. Keep your answers EXTREMELY concise, ideally 1-3 sentences maximum. Do not provide long explanations or massive code blocks unless specifically requested. You are chatting in a small chat window."
     })
 
-    // Convert our message format to Gemini's format
     const history = messages.slice(0, -1).map((msg: any) => ({
       role: msg.role === 'bot' ? 'model' : 'user',
       parts: [{ text: msg.text }]
     }))
     
-    // Gemini startChat requires the first message to be from 'user'
     while (history.length > 0 && history[0].role === 'model') {
       history.shift()
     }

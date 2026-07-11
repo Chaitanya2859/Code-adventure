@@ -40,17 +40,14 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      {/* Pixel art background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <img src="/crown.png" alt="Logo" className="w-12 h-12" />
           <h1 className="font-game text-4xl text-white mt-2">Code Adventure</h1>
         </div>
 
-        {/* Card */}
         <div className="bg-zinc-900 border-2 border-zinc-700 rounded-2xl p-8 shadow-2xl shadow-yellow-400/5">
           <h2 className="font-game text-3xl text-white mb-2 text-center">Start Your Quest!</h2>
           <p className="text-zinc-500 text-center mb-8 font-game text-lg">Create your hero profile</p>

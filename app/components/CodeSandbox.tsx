@@ -9,9 +9,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
-// ────────────────────────────────────────────────────
-// Types
-// ────────────────────────────────────────────────────
 type Tab = 'html' | 'css' | 'js'
 
 interface FileState {
@@ -43,14 +40,14 @@ interface Instruction {
 interface CodeSandboxProps {
   instruction: Instruction
   defaultFiles?: Partial<FileState>
-  language?: Tab           // single-file mode (default: 'html')
-  tabs?: Tab[]             // which tabs to show
-  exerciseNumber?: number  // current exercise index (1-based)
-  totalExercises?: number  // total exercises in the chapter
-  xpPerExercise?: number   // XP awarded on completion
-  onComplete?: () => void  // callback when completed
+  language?: Tab
+  tabs?: Tab[]
+  exerciseNumber?: number
+  totalExercises?: number  
+  xpPerExercise?: number   
+  onComplete?: () => void  
   onSubmit?: (files: FileState) => void
-  backHref?: string        // href for back to course button
+  backHref?: string    
   courseId?: string
   chapterId?: string
   exerciseSlug?: string
@@ -60,9 +57,6 @@ interface CodeSandboxProps {
   initialXp?: number
 }
 
-// ────────────────────────────────────────────────────
-// Defaults
-// ────────────────────────────────────────────────────
 const DEFAULT_FILES: FileState = {
   html: `<!DOCTYPE html>
 <html lang="en">
@@ -161,18 +155,12 @@ function buildSrcdoc(files: FileState): string {
 </script>
 `;
 
-  // Inject CSS into the HTML string
-  const withInterceptor = consoleInterceptorScript + files.html;
-  let withStyles = withInterceptor;
-  const linkRegex = /<link[^>]*rel=["']?stylesheet["']?[^>]*href=["']?style\.css["']?[^>]*>/i;
   
-  if (withStyles.match(linkRegex)) {
-    withStyles = withStyles.replace(linkRegex, `<style>${files.css}</style>`);
-  } else if (withStyles.includes('</head>')) {
-    withStyles = withStyles.replace('</head>', `<style>${files.css}</style>\n</head>`);
-  } else {
-    withStyles = `<style>${files.css}</style>\n` + withStyles;
-  }
+  const withInterceptor = consoleInterceptorScript + files.html;
+  const withStyles = withInterceptor.replace(
+    '<style>/* CSS will be injected here */</style>',
+    `<style>${files.css}</style>`
+  );
 
   let withScript = '';
   const scriptRegex = /<script[^>]*src=["']?script\.js["']?[^>]*><\/script>/i;
@@ -194,9 +182,6 @@ function buildSrcdoc(files: FileState): string {
   return withScript;
 }
 
-// ────────────────────────────────────────────────────
-// Component
-// ────────────────────────────────────────────────────
 export default function CodeSandbox({
   instruction,
   defaultFiles,
@@ -225,12 +210,12 @@ export default function CodeSandbox({
     ...defaultFiles,
   })
   const [activeTab, setActiveTab] = useState<Tab>(language)
-  const [iframeKey, setIframeKey] = useState(0)      // force iframe remount on run
-  const [hasRun, setHasRun] = useState(true)         // track if code has been run
-  const [completed, setCompleted] = useState(isAlreadyCompleted)   // completion state
-  const [totalXp, setTotalXp] = useState(initialXp)           // accumulated XP
-  const [doneCount, setDoneCount] = useState(isAlreadyCompleted ? 1 : 0)       // exercises completed
-  const [showBanner, setShowBanner] = useState(false) // completion banner
+  const [iframeKey, setIframeKey] = useState(0)
+  const [hasRun, setHasRun] = useState(true)
+  const [completed, setCompleted] = useState(isAlreadyCompleted)
+  const [totalXp, setTotalXp] = useState(initialXp)
+  const [doneCount, setDoneCount] = useState(isAlreadyCompleted ? 1 : 0)
+  const [showBanner, setShowBanner] = useState(false)
 
   const [rightTab, setRightTab] = useState<'preview' | 'console'>('preview')
   const [mobileTab, setMobileTab] = useState<'question' | 'code' | 'output'>('question')
@@ -266,36 +251,29 @@ export default function CodeSandbox({
     return () => window.removeEventListener('message', handleMessage)
   }, [])
 
-  // ── Editor mount ────────────────────────────────
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor
   }
-
-  // ── Sync editor value → files state on change ──
   const handleEditorChange = (value: string | undefined) => {
     setFiles(prev => ({ ...prev, [activeTab]: value ?? '' }))
   }
 
-  // ── Run: inject content into iframe ────────────
   const handleRun = () => {
-    setConsoleLogs([]) // clear logs on run
+    setConsoleLogs([])
     setCompiledCode(buildSrcdoc(files))
     setHasRun(true)
-    setIframeKey(k => k + 1)   // remount = clean slate
-    // Switch to console upon running only if we are in the JavaScript course (courseId = '3')
-    if (courseId === '3') {
+    setIframeKey(k => k + 1)
+    if (courseId === '6') {
       setRightTab('console')
     }
   }
 
-  // ── Reload: compile latest code and reload iframe ──
   const handleReloadPreview = () => {
     setConsoleLogs([])
     setCompiledCode(buildSrcdoc(files))
     setIframeKey(k => k + 1)
   }
 
-  // ── Reset to defaults ───────────────────────────
   const handleReset = () => {
     const fresh = { ...DEFAULT_FILES, ...defaultFiles }
     setFiles(fresh)
@@ -307,12 +285,10 @@ export default function CodeSandbox({
     setIframeKey(k => k + 1)
   }
 
-  // ── Submit ──────────────────────────────────────
   const handleSubmit = () => {
     onSubmit?.(files)
   }
 
-  // ── Complete ─────────────────────────────────────
   const handleComplete = async () => {
     if (completed) return
     setCompleted(true)
@@ -343,14 +319,10 @@ export default function CodeSandbox({
   }
 
 
-  // ────────────────────────────────────────────────
-  // Render
-  // ────────────────────────────────────────────────
 
   const renderInstructionsPanel = () => (
     <div className="bg-[#0A0B1A] flex flex-col overflow-hidden relative h-full w-full">
           
-          {/* Top Bar for Back Button */}
           {backHref && (
             <div className="bg-[#06080F] border-b border-[#1E293B] px-4 py-2 flex items-center shrink-0">
               <Link href={backHref}>
@@ -361,9 +333,8 @@ export default function CodeSandbox({
             </div>
           )}
 
-          {/* scrollable body */}
+
           <div className="flex-1 overflow-y-auto">
-            {/* Learning content header area */}
             <div className="p-6 pb-4 border-b border-[#1E293B]">
                {instruction.numberTitle && (
                  <p className="text-zinc-500 font-bold mb-2 uppercase tracking-wider text-xs">{instruction.numberTitle}</p>
@@ -371,11 +342,11 @@ export default function CodeSandbox({
                <h1 className="text-white text-3xl font-bold mb-4">{instruction.mainHeading}</h1>
                
                {instruction.introduction && (
-                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: instruction.introduction }}></p>
+                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]">{instruction.introduction}</p>
                )}
 
                {instruction.conceptExplanation && (
-                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: instruction.conceptExplanation }}></p>
+                 <p className="text-sm leading-relaxed mb-4 text-[#A8B2D1]">{instruction.conceptExplanation}</p>
                )}
 
                {instruction.relatedConcepts && instruction.relatedConcepts.length > 0 && (
@@ -384,7 +355,7 @@ export default function CodeSandbox({
                    <ul className="list-disc pl-5 space-y-2 text-sm mb-4">
                      {instruction.relatedConcepts.map((concept, idx) => (
                         <li key={idx}>
-                          <span className="font-bold text-white">{concept.title}:</span> <span className="text-[#A8B2D1]" dangerouslySetInnerHTML={{ __html: concept.desc }}></span>
+                          <span className="font-bold text-white">{concept.title}:</span> <span className="text-[#A8B2D1]">{concept.desc}</span>
                         </li>
                      ))}
                    </ul>
@@ -394,12 +365,11 @@ export default function CodeSandbox({
                {instruction.funFact && (
                  <div className="bg-[#1A1F35] border border-[#2A3441] rounded-lg p-4 mt-6">
                    <p className="font-bold text-yellow-400 text-xs uppercase tracking-wider mb-1">🧐 Fun Fact</p>
-                   <p className="text-sm text-[#A8B2D1] leading-relaxed" dangerouslySetInnerHTML={{ __html: instruction.funFact }}></p>
+                   <p className="text-sm text-[#A8B2D1] leading-relaxed">{instruction.funFact}</p>
                  </div>
                )}
             </div>
 
-            {/* Actual Instructions */}
             <div className="bg-[#181D31] py-3 px-6 border-b border-[#1E293B]">
               <h2 className="font-bold text-white text-sm uppercase tracking-widest">Instructions</h2>
             </div>
@@ -450,7 +420,7 @@ export default function CodeSandbox({
 
   const renderEditorPanel = () => (
     <div className="flex flex-col bg-[#011C3A] overflow-hidden relative h-full w-full">
-          {/* Tab bar */}
+          
           <div className="flex items-center px-0 bg-[#0A0B1A]">
             {tabs.map(tab => {
               const isActive = activeTab === tab;
@@ -490,7 +460,7 @@ export default function CodeSandbox({
             )})}
           </div>
 
-          {/* Monaco Editor */}
+          
           <div className="flex-1 pt-2 pb-16 overflow-hidden">
             <Editor
               height="100%"
@@ -515,7 +485,7 @@ export default function CodeSandbox({
             />
           </div>
 
-          {/* Bottom Toolbar inside Editor */}
+          
           <div className="absolute bottom-0 left-0 w-full p-4 flex justify-between items-center bg-gradient-to-t from-[#011C3A] to-transparent">
              <Button variant="outline" className="bg-[#0D1117] border-zinc-700 text-white hover:bg-zinc-800" size="icon" onClick={handleReset}>
                 <RotateCcw size={16} />
@@ -542,7 +512,7 @@ export default function CodeSandbox({
 
   const renderPreviewPanel = () => (
     <div className="flex flex-col bg-[#0A0B1A] overflow-hidden h-full w-full">
-          {/* Tabs bar */}
+          
           <div className="flex items-center justify-between px-4 py-2 bg-[#0A0B1A] border-b border-[#1E293B]">
             <div className="flex gap-2">
               <button
@@ -580,9 +550,9 @@ export default function CodeSandbox({
             )}
           </div>
 
-          {/* Content Area */}
+          
           <div className="flex-1 w-full h-full relative bg-[#06080F]">
-            {/* The iframe is always in the DOM but hidden when not in preview tab */}
+            
             <div className={rightTab === 'preview' ? 'w-full h-full' : 'absolute inset-0 pointer-events-none opacity-0 invisible'}>
               {!hasRun ? (
                 <div className="flex flex-col items-center justify-center h-full text-[#64748B] text-center p-8 max-w-xs mx-auto">
@@ -603,7 +573,7 @@ export default function CodeSandbox({
               )}
             </div>
 
-            {/* The Console container, visible when active */}
+            
             {rightTab === 'console' && (
               <div className="w-full h-full flex flex-col p-4 font-mono text-sm overflow-y-auto bg-[#070913] text-zinc-300 select-text absolute inset-0">
                 {consoleLogs.length === 0 ? (
@@ -642,10 +612,6 @@ export default function CodeSandbox({
 
     <div className="flex flex-col h-[100dvh] bg-[#06080F] overflow-hidden text-zinc-300 font-sans relative">
 
-      {/* ── WORKSPACE ── */}
-      {/* ── WORKSPACE ── */}
-      
-      {/* ── DESKTOP WORKSPACE ── */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
         <PanelGroup direction="horizontal" className="flex-1">
           <Panel defaultSize={30} minSize={20}>{renderInstructionsPanel()}</Panel>
@@ -656,16 +622,16 @@ export default function CodeSandbox({
         </PanelGroup>
       </div>
 
-      {/* ── MOBILE WORKSPACE ── */}
+      
       <div className="flex lg:hidden flex-col flex-1 overflow-hidden relative">
-        {/* Sticky Tabs */}
+        
         <div className="flex bg-[#0A0B1A] border-b border-[#1E293B] shrink-0 sticky top-0 z-10">
           <button onClick={() => setMobileTab('question')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'question' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Lessons</button>
           <button onClick={() => setMobileTab('code')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'code' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Code</button>
           <button onClick={() => setMobileTab('output')} className={`flex-1 py-3 text-sm font-bold transition-colors ${mobileTab === 'output' ? 'text-white border-b-2 border-orange-500' : 'text-zinc-500'}`}>Preview</button>
         </div>
         
-        {/* Current Page Content */}
+        
         <div className="flex-1 overflow-hidden">
           {mobileTab === 'question' && renderInstructionsPanel()}
           {mobileTab === 'code' && renderEditorPanel()}
@@ -674,7 +640,7 @@ export default function CodeSandbox({
       </div>
 
 
-      {/* ── COMPLETION BANNER ── */}
+      
       {showBanner && (
         <div className="absolute top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-yellow-400 text-black font-game text-2xl px-8 py-4 border-4 border-b-8 border-yellow-600 rounded-xl shadow-[0_10px_0_0_rgba(0,0,0,0.5)] animate-bounce">
           <Trophy size={32} className="text-orange-600 animate-pulse" />
@@ -685,20 +651,36 @@ export default function CodeSandbox({
         </div>
       )}
 
-      {/* ── GLOBAL FOOTER ── */}
+
       <footer className="h-auto min-h-[64px] py-2 lg:py-0 bg-[#06080F] border-t border-[#1E293B] flex flex-wrap lg:flex-nowrap items-center justify-between px-3 lg:px-6 gap-2">
-        {/* left group */}
+        
         <div className="flex items-center gap-2 lg:gap-4">
+          <button className="bg-[#181D31] p-1.5 lg:p-2 rounded-md border border-[#2A3441] hover:bg-[#2A3441] transition-colors shrink-0">
+            <List size={20} className="text-zinc-300" />
+          </button>
           <div className="hidden md:flex flex-col">
+             <h3 className="text-sm font-bold text-white leading-tight">{instruction.mainHeading || "Exercise"}</h3>
              <div className="flex items-center gap-2 mt-1">
                <span className="text-xs text-zinc-500">
                  Exercise {exerciseNumber} / {totalExercises}
                </span>
+               <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-400 px-2 py-0.5 rounded-full">
+                 {totalXp} XP
+               </span>
+               <span className="text-[10px] font-bold bg-blue-950 text-[#38bdf8] px-2 py-0.5 rounded-full border border-blue-900/50">
+                 Lvl {Math.floor(totalXp / 100) + 1}
+               </span>
+               
+               <div className="w-16 h-1.5 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700/60 ml-1" title={`${totalXp % 100} / 100 XP to next level`}>
+                 <div 
+                   className="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-500"
+                   style={{ width: `${totalXp % 100}%` }}
+                 />
+               </div>
              </div>
           </div>
         </div>
 
-        {/* center group – Complete button */}
         {!completed && (
           <button
             onClick={handleComplete}
@@ -715,7 +697,7 @@ export default function CodeSandbox({
           </button>
         )}
 
-        {/* right group */}
+        
         <div className="flex items-center gap-2 lg:gap-3 shrink-0 ml-auto md:ml-0">
            {prevHref ? (
              <Link href={prevHref}>

@@ -12,7 +12,7 @@ const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
   path: '/',
-  maxAge: 60 * 60 * 24 * 7, // 7 days
+  maxAge: 60*60*24*7,
 };
 
 export interface SessionUser {
@@ -22,9 +22,7 @@ export interface SessionUser {
   avatar?: string;
 }
 
-/**
- * Sign a JWT token with user payload
- */
+
 export async function signJwt(user: SessionUser): Promise<string> {
   return new SignJWT({ ...user })
     .setProtectedHeader({ alg: 'HS256' })
@@ -33,9 +31,7 @@ export async function signJwt(user: SessionUser): Promise<string> {
     .sign(JWT_SECRET);
 }
 
-/**
- * Verify a JWT token and return the decoded payload
- */
+
 export async function verifyJwt(token: string): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
@@ -45,10 +41,7 @@ export async function verifyJwt(token: string): Promise<SessionUser | null> {
   }
 }
 
-/**
- * Get current session from cookie (for use in Server Components and API Routes)
- * Works with next/headers cookies() helper
- */
+
 export async function getSession(): Promise<SessionUser | null> {
   try {
     const cookieStore = await cookies();
@@ -60,18 +53,13 @@ export async function getSession(): Promise<SessionUser | null> {
   }
 }
 
-/**
- * Get current session from a NextRequest object (for use in middleware or API routes with req)
- */
+
 export async function getSessionFromRequest(req: NextRequest): Promise<SessionUser | null> {
   const token = req.cookies.get(COOKIE_NAME)?.value;
   if (!token) return null;
   return verifyJwt(token);
 }
 
-/**
- * Build cookie headers for setting or clearing the session cookie
- */
 export function buildSessionCookie(token: string): string {
   const opts = COOKIE_OPTIONS;
   return `${COOKIE_NAME}=${token}; Path=${opts.path}; Max-Age=${opts.maxAge}; HttpOnly; SameSite=${opts.sameSite}${opts.secure ? '; Secure' : ''}`;

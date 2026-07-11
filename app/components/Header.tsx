@@ -30,7 +30,6 @@ const Header = () => {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -43,7 +42,6 @@ const Header = () => {
 
   if (!mounted) return null;
 
-  // Get initials for avatar
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '?';
@@ -60,53 +58,52 @@ const Header = () => {
       <div className="hidden md:block">
         <NavigationMenu>
           <NavigationMenuList className="flex gap-8 font-game text-2xl justify-center">
-          {user && (
+            {user && (
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link href="/dashboard" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors text-yellow-400">
+                    Dashboard
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="font-game text-2xl">Courses</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
+                  {courses.map((course, index) => (
+                    <NavigationMenuLink asChild key={index}>
+                      <Link href={course.path}>
+                        <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
+                          <h2 className="font-bold">{course.name}</h2>
+                          <p className="text-xs text-zinc-500">{course.desc}</p>
+                        </div>
+                      </Link>
+                    </NavigationMenuLink>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link href="/dashboard" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors text-yellow-400">
-                  Dashboard
+                <Link href="/pricing" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+                  Pricing
                 </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-          )}
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className="font-game text-2xl">Courses</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid md:grid-cols-2 gap-2 lg:w-[600px] sm:w-[400px] md:w-[500px]">
-                {courses.map((course, index) => (
-                  <NavigationMenuLink asChild key={index}>
-                    <Link href={course.path}>
-                      <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
-                         <h2 className="font-bold">{course.name}</h2>
-                        <p className="text-xs text-zinc-500">{course.desc}</p>
-                      </div>
-                    </Link>
-                  </NavigationMenuLink>
-                ))}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link href="/pricing" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
-                Pricing
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link href="/contactus" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
-                Assistance
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link href="/contactus" className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 font-game text-2xl hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none transition-colors">
+                  Assistance
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Auth section */}
         {loading ? (
           <div className="w-24 h-10 bg-zinc-800 rounded-lg animate-pulse" />
         ) : !user ? (
@@ -154,13 +151,11 @@ const Header = () => {
           </div>
         )}
 
-        {/* Mobile Menu Toggle */}
         <button className="md:hidden p-2 text-white" onClick={() => setMobileMenuOpen(true)}>
           <Menu size={32} />
         </button>
       </div>
 
-      {/* Mobile Sidebar */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
           <div className="w-64 h-full bg-zinc-900 border-l border-zinc-800 p-6 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-right">

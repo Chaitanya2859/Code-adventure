@@ -120,7 +120,9 @@ const exerciseData: Record<string, any> = {
 }
 
 function getInstruction(slug: string) {
-  return exerciseData[slug] ?? exerciseData._default
+  const data = exerciseData[slug];
+  console.log('Requested slug:', slug, 'Found:', !!data);
+  return data ?? exerciseData._default
 }
 
 // ────────────────────────────────────────────────────

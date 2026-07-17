@@ -26,8 +26,6 @@ export async function GET(req: NextRequest) {
         );
         const completed = completedResult.rows;
 
-
-
         const level = Math.floor(totalXp / 100) + 1;
         const levelProgress = totalXp % 100;
 

@@ -11,6 +11,18 @@ export async function POST(req: NextRequest) {
         const { courseId, chapterId, exerciseSlug, xp } = body;
         const email = authUser.email;
 
+        // Verify plan for JavaScript (paid course)
+        if (Number(courseId) === 3) {
+            const userRes = await pool.query(`SELECT plan FROM users WHERE email = $1`, [email]);
+            const plan = userRes.rows[0]?.plan || 'Explorer';
+            if (plan !== 'Adventurer' && plan !== 'Legend') {
+                return NextResponse.json(
+                    { error: "JavaScript exercises are locked behind Adventurer and Legend plans. Please upgrade to continue." },
+                    { status: 403 }
+                );
+            }
+        }
+
         // Check if already completed
         const existing = await pool.query(
             `SELECT * FROM "completedExercise"

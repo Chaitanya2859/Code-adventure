@@ -4,7 +4,14 @@ import HeroCTA from "./HeroCTA"
 const Hero = () => {
   return (
     <div className="relative w-full min-h-[calc(100vh-11vh)] overflow-hidden">
-        <img src="/hero3.gif" alt="Hero background" className="w-full h-full object-cover absolute inset-0 -z-10" />
+        <Image
+          src="/hero3.gif"
+          alt="Hero background"
+          fill
+          priority
+          unoptimized
+          className="object-cover -z-10"
+        />
         <div className="absolute w-full mt-24 md:mt-32 flex flex-col justify-center items-center text-center px-4 z-10">
             <h2 className="font-bold text-5xl md:text-7xl font-game" 
                         style={

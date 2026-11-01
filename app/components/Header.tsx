@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/navigation-menu"
 import { cn } from "@/lib/utils"
 import Link from "next/link";
+import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
 
 const courses = [
-  { id: 1, name: "HTML", desc: "Learn the fundamentals of HTML and build the structure of modern web pages.", path: "/courses/1" },
-  { id: 2, name: "CSS", desc: "Master CSS to style and design responsive, visually appealing web layouts.", path: "/courses/2" },
-  { id: 3, name: "JavaScript", desc: "Learn the basics of JavaScript and start adding interactivity to your web pages.", path: "/courses/3" },
+  { id: 1, name: "HTML", desc: "Learn the fundamentals of HTML and build the structure of modern web pages.", path: "/courses/1", badge: "Free" },
+  { id: 2, name: "CSS", desc: "Master CSS to style and design responsive, visually appealing web layouts.", path: "/courses/2", badge: "Free" },
+  { id: 3, name: "JavaScript", desc: "Learn the basics of JavaScript and start adding interactivity to your web pages.", path: "/courses/3", badge: "Paid" },
   { id: 4, name: "All courses", desc: "Explore all our available coding courses.", path: "/courses" },
 ];
 
@@ -51,7 +52,7 @@ const Header = () => {
     <div className="py-4 px-4 md:px-8 lg:px-16 w-full flex justify-between items-center gap-4">
       <Link href="/">
         <div className="flex gap-3 md:gap-4 items-center cursor-pointer">
-          <img src="/crown.png" alt="Logo" className="w-8 h-8 md:w-10 md:h-10" />
+          <Image src="/crown.png" alt="Logo" width={40} height={40} priority className="w-8 h-8 md:w-10 md:h-10" />
           <h2 className="font-game text-2xl md:text-3xl mt-1 md:mt-2">Code Adventure</h2>
         </div>
       </Link>
@@ -76,7 +77,18 @@ const Header = () => {
                         <NavigationMenuLink asChild key={index}>
                           <Link href={course.path}>
                             <div className="p-2 hover:bg-accent rounded-lg cursor-pointer h-full">
-                              <h2 className="font-bold">{course.name}</h2>
+                              <div className="flex items-center justify-between gap-2">
+                                <h2 className="font-bold">{course.name}</h2>
+                                {course.badge && (
+                                  <span className={`text-[10px] uppercase font-mono px-1.5 py-0.5 rounded ${
+                                    course.badge === 'Paid'
+                                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40'
+                                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                  }`}>
+                                    {course.badge}
+                                  </span>
+                                )}
+                              </div>
                               <p className="text-xs text-zinc-500">{course.desc}</p>
                             </div>
                           </Link>
@@ -85,6 +97,7 @@ const Header = () => {
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
+
 
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>

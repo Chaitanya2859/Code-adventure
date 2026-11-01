@@ -26,7 +26,9 @@ export default function Provider({
       .then(res => {
         if (res.data.user) {
           setAuthUser(res.data.user);
-          if (!hasCreatedUser.current) {
+          if (res.data.userDetail) {
+            setUserDetail(res.data.userDetail);
+          } else if (!hasCreatedUser.current) {
             hasCreatedUser.current = true;
             axios.post('/api/user/', {})
               .then(r => setUserDetail(r.data))

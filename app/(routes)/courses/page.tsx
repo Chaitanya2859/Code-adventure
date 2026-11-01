@@ -3,9 +3,17 @@ import CourseList from './_components/CourseList'
 
 const Courses = () => {
   return (
-    <div className=''>
-        <div className="relative ">
-            <Image src={'/hero7.gif'} alt="Courses Banner" width={1920} height={400} unoptimized className='w-full object-cover h-[400px]' />
+    <div>
+        <div className="relative">
+            <Image
+              src="/hero7.gif"
+              alt="Courses Banner"
+              width={1920}
+              height={400}
+              priority
+              unoptimized
+              className='w-full object-cover h-[400px]'
+            />
             <div style={
                 {
                     textShadow: "1px 1px 0 #000, -1px -1px 0 #000,1px -1px 0 #000, -1px 1px 0 #000"

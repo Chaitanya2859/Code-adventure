@@ -8,12 +8,14 @@ import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const gameFont = Jersey_10({
   variable: "--font-game",
   subsets: ["latin"],
-  weight: ['400']
+  weight: ['400'],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

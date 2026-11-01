@@ -17,9 +17,10 @@ export async function POST(req: NextRequest) {
       planName
     } = await req.json();
 
+    const secret = process.env.RAZORPAY_SECRET || process.env.RAZORPAY_SECRET_KEY || '';
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET!)
+      .createHmac("sha256", secret)
       .update(sign.toString())
       .digest("hex");
 

@@ -64,7 +64,7 @@ const UserCurrentStatus = () => {
             </div>
             <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700">
               <div 
-                className="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-500" 
+                className="h-full bg-yellow-400 transition-all duration-500" 
                 style={{ width: `${stats.levelProgress}%` }}
               />
             </div>

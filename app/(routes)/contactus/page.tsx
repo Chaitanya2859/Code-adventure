@@ -18,6 +18,7 @@ const textShadow = {
 
 const team = [
   { name: "Chaitanya Bhagat", role: "Creator", avatar: "/trainer.gif" },
+  { name: "Nitin Bhandari", role: "Creator", avatar: "/trainer.gif" },
 ]
 
 export default function ContactUsPage() {
@@ -68,7 +69,8 @@ export default function ContactUsPage() {
           alt="Contact Banner"
           width={1920}
           height={400}
-          unoptimized
+          priority
+          sizes="100vw"
           className="w-full object-cover h-72"
         />
         <div
@@ -127,22 +129,24 @@ export default function ContactUsPage() {
           </form>
         </div>
 
-        {/* Creator */}
-        <div className="w-full max-w-4xl flex items-center justify-between bg-zinc-900 border-2 border-zinc-700 rounded-xl p-4 font-game">
-          <div className="flex items-center gap-4">
-            <Image
-              src={team[0].avatar}
-              alt={team[0].name}
-              width={56}
-              height={56}
-              unoptimized
-              className="rounded-full"
-            />
-            <div>
-              <h3 className="text-2xl">{team[0].name}</h3>
-              <p className="text-zinc-400 text-lg">{team[0].role}</p>
+        {/* Creators */}
+        <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-4 font-game">
+          {team.map((member) => (
+            <div key={member.name} className="flex items-center gap-4 bg-zinc-900 border-2 border-zinc-700 rounded-xl p-4">
+              <Image
+                src={member.avatar}
+                alt={member.name}
+                width={56}
+                height={56}
+                unoptimized
+                className="rounded-full"
+              />
+              <div>
+                <h3 className="text-2xl">{member.name}</h3>
+                <p className="text-zinc-400 text-lg">{member.role}</p>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

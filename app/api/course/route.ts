@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
                 [Number(courseId)]
             ),
             pool.query(
-                `SELECT * FROM chapters WHERE "courseId" = $1`,
+                `SELECT * FROM chapters WHERE "courseId" = $1 ORDER BY "chapterId" ASC`,
                 [Number(courseId)]
             ),
             pool.query(
@@ -51,6 +51,10 @@ export async function GET(req: NextRequest) {
         });
     } else {
         const res = await pool.query(`SELECT * FROM courses ORDER BY "courseId" ASC`);
-        return NextResponse.json(res.rows);
+        return NextResponse.json(res.rows, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+            },
+        });
     }
 }

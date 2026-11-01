@@ -2,9 +2,11 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Lock } from "lucide-react";
+import { UserDetailsContext } from "@/context/UserDetailsContext";
 
 type Course = {
     courseId: number,
@@ -15,6 +17,8 @@ type Course = {
 }
 
 const EnrollCourses = () => {
+    const { userDetail } = useContext(UserDetailsContext);
+    const isPremium = userDetail?.plan === 'Adventurer' || userDetail?.plan === 'Legend';
     const [enrollCourse, setEnrollCourse]= useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -57,8 +61,32 @@ const EnrollCourses = () => {
             {enrollCourse.map((course, idx) => (
                 <Link key={idx} href={`/courses/${course.courseId}`}>
                     <div className="bg-zinc-900 border-2 border-zinc-800 p-4 rounded-2xl hover:bg-zinc-800 transition-colors cursor-pointer h-full">
-                        {course.banner && <Image src={course.banner.trimEnd()} alt={course.title} width={300} height={150} className="w-full h-40 object-cover rounded-xl mb-4" unoptimized />}
-                        <h2 className="text-3xl font-game">{course.title}</h2>
+                        {course.banner && (
+                            <div className="relative mb-4">
+                                <Image 
+                                    src={course.banner.trimEnd()} 
+                                    alt={course.title} 
+                                    width={400} 
+                                    height={200} 
+                                    unoptimized
+                                    loading="lazy"
+                                    className="w-full h-40 object-cover rounded-xl" 
+                                />
+                                {course.courseId === 3 && !isPremium && (
+                                    <span className="absolute top-2 right-2 bg-black/85 backdrop-blur-md text-yellow-400 border border-yellow-500/60 px-2.5 py-1 rounded-lg text-xs font-game flex items-center gap-1 shadow-lg">
+                                        <Lock className="w-3 h-3" /> Locked
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between gap-2">
+                            <h2 className="text-3xl font-game">{course.title}</h2>
+                            {course.courseId === 3 && !isPremium && (
+                                <span className="text-xs text-yellow-400 font-game bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/30">
+                                    Adventurer/Legend
+                                </span>
+                            )}
+                        </div>
                         <p className="text-zinc-400 line-clamp-2 mt-2 font-game">{course.desc}</p>
                     </div>
                 </Link>

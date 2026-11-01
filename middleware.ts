@@ -6,6 +6,8 @@ const publicRoutes = [
   '/sign-in',
   '/sign-up',
   '/courses',
+  '/quizzes',
+  '/crashcourse',
   '/pricing',
   '/contactus',
 ];
@@ -16,16 +18,16 @@ function isPublicRoute(pathname: string): boolean {
   );
 }
 
-// Auth API routes are always public
-function isAuthApiRoute(pathname: string): boolean {
-  return pathname.startsWith('/api/auth/');
+// Public API routes
+function isPublicApiRoute(pathname: string): boolean {
+  return pathname.startsWith('/api/auth/') || pathname === '/api/chat';
 }
 
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Allow public routes and auth API
-  if (isPublicRoute(pathname) || isAuthApiRoute(pathname)) {
+  // Allow public routes and public API
+  if (isPublicRoute(pathname) || isPublicApiRoute(pathname)) {
     return NextResponse.next();
   }
 
